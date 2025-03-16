@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 16,
+            "activePatchIndex": 21,
             "patches": [
                 {
                     "date": 1742123303870,
@@ -72,6 +72,26 @@
                 {
                     "date": 1742154730395,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,39 +1,70 @@\n import 'package:flutter/foundation.dart';\r\n+import 'package:shared_preferences/shared_preferences.dart';\r\n import 'package:url_launcher/url_launcher.dart';\r\n import 'package:aybudle/core/services/api_service.dart';\r\n \r\n class ConnectionViewModel with ChangeNotifier {\r\n   String _url = '';\r\n   bool _isLoading = false;\r\n-  bool _rememberSite = false; // new flag\r\n+  bool _rememberSite = false;\r\n   final ApiService _apiService = ApiService();\r\n \r\n   String get url => _url;\r\n   bool get isLoading => _isLoading;\r\n   bool get rememberSite => _rememberSite;\r\n \r\n+  ConnectionViewModel() {\r\n+    _loadRememberedSite();\r\n+  }\r\n+\r\n   void setUrl(String value) {\r\n     _url = value;\r\n     notifyListeners();\r\n+    // If \"Remember Site\" is enabled, update the stored URL automatically\r\n+    if (_rememberSite) {\r\n+      _saveSite();\r\n+    }\r\n   }\r\n \r\n-  void toggleRememberSite(bool? value) {\r\n+  void toggleRememberSite(bool? value) async {\r\n     _rememberSite = value ?? false;\r\n     notifyListeners();\r\n+    if (_rememberSite) {\r\n+      _saveSite();\r\n+    } else {\r\n+      final prefs = await SharedPreferences.getInstance();\r\n+      await prefs.remove('rememberedSite');\r\n+    }\r\n   }\r\n \r\n+  Future<void> _saveSite() async {\r\n+    final prefs = await SharedPreferences.getInstance();\r\n+    await prefs.setString('rememberedSite', _url);\r\n+  }\r\n+\r\n+  Future<void> _loadRememberedSite() async {\r\n+    final prefs = await SharedPreferences.getInstance();\r\n+    final savedSite = prefs.getString('rememberedSite');\r\n+    if (savedSite != null && savedSite.isNotEmpty) {\r\n+      _url = savedSite;\r\n+      _rememberSite = true;\r\n+      notifyListeners();\r\n+    }\r\n+  }\r\n+\r\n   Future<bool> connectToSite() async {\r\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n       if (await canLaunchUrl(Uri.parse(_url))) {\r\n-        // Optionally, store _url persistently if _rememberSite is true\r\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n       }\r\n+      _isLoading = false;\r\n+      notifyListeners();\r\n       return false;\r\n     } catch (e) {\r\n       _isLoading = false;\r\n       notifyListeners();\r\n"
+                },
+                {
+                    "date": 1742157316866,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,14 +1,12 @@\n import 'package:flutter/foundation.dart';\r\n import 'package:shared_preferences/shared_preferences.dart';\r\n import 'package:url_launcher/url_launcher.dart';\r\n-import 'package:aybudle/core/services/api_service.dart';\r\n \r\n class ConnectionViewModel with ChangeNotifier {\r\n   String _url = '';\r\n   bool _isLoading = false;\r\n   bool _rememberSite = false;\r\n-  final ApiService _apiService = ApiService();\r\n \r\n   String get url => _url;\r\n   bool get isLoading => _isLoading;\r\n   bool get rememberSite => _rememberSite;\r\n"
+                },
+                {
+                    "date": 1742157326331,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,12 +1,14 @@\n import 'package:flutter/foundation.dart';\r\n import 'package:shared_preferences/shared_preferences.dart';\r\n import 'package:url_launcher/url_launcher.dart';\r\n+import 'package:aybudle/core/services/api_service.dart';\r\n \r\n class ConnectionViewModel with ChangeNotifier {\r\n   String _url = '';\r\n   bool _isLoading = false;\r\n   bool _rememberSite = false;\r\n+  final ApiService _apiService = ApiService();\r\n \r\n   String get url => _url;\r\n   bool get isLoading => _isLoading;\r\n   bool get rememberSite => _rememberSite;\r\n"
+                },
+                {
+                    "date": 1742157373807,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,12 +19,8 @@\n \r\n   void setUrl(String value) {\r\n     _url = value;\r\n     notifyListeners();\r\n-    // If \"Remember Site\" is enabled, update the stored URL automatically\r\n-    if (_rememberSite) {\r\n-      _saveSite();\r\n-    }\r\n   }\r\n \r\n   void toggleRememberSite(bool? value) async {\r\n     _rememberSite = value ?? false;\r\n@@ -52,8 +48,13 @@\n     }\r\n   }\r\n \r\n   Future<bool> connectToSite() async {\r\n+    // If \"Remember Site\" is enabled, update the stored URL automatically\r\n+    if (_rememberSite) {\r\n+      _saveSite();\r\n+    }\r\n+\r\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n"
+                },
+                {
+                    "date": 1742157569206,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,14 +1,12 @@\n import 'package:flutter/foundation.dart';\r\n import 'package:shared_preferences/shared_preferences.dart';\r\n import 'package:url_launcher/url_launcher.dart';\r\n-import 'package:aybudle/core/services/api_service.dart';\r\n \r\n class ConnectionViewModel with ChangeNotifier {\r\n   String _url = '';\r\n   bool _isLoading = false;\r\n   bool _rememberSite = false;\r\n-  final ApiService _apiService = ApiService();\r\n \r\n   String get url => _url;\r\n   bool get isLoading => _isLoading;\r\n   bool get rememberSite => _rememberSite;\r\n"
+                },
+                {
+                    "date": 1742157853308,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,9 +16,8 @@\n   }\r\n \r\n   void setUrl(String value) {\r\n     _url = value;\r\n-    notifyListeners();\r\n   }\r\n \r\n   void toggleRememberSite(bool? value) async {\r\n     _rememberSite = value ?? false;\r\n"
                 }
             ],
             "date": 1742123303869,

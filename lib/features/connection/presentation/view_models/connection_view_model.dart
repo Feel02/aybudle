@@ -1,13 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:aybudle/core/services/api_service.dart';
 
 class ConnectionViewModel with ChangeNotifier {
   String _url = '';
   bool _isLoading = false;
   bool _rememberSite = false;
-  final ApiService _apiService = ApiService();
 
   String get url => _url;
   bool get isLoading => _isLoading;
@@ -19,11 +17,6 @@ class ConnectionViewModel with ChangeNotifier {
 
   void setUrl(String value) {
     _url = value;
-    notifyListeners();
-    // If "Remember Site" is enabled, update the stored URL automatically
-    if (_rememberSite) {
-      _saveSite();
-    }
   }
 
   void toggleRememberSite(bool? value) async {
@@ -53,6 +46,11 @@ class ConnectionViewModel with ChangeNotifier {
   }
 
   Future<bool> connectToSite() async {
+    // If "Remember Site" is enabled, update the stored URL automatically
+    if (_rememberSite) {
+      _saveSite();
+    }
+
     _isLoading = true;
     notifyListeners();
 

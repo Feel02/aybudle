@@ -22,12 +22,10 @@ class LoginViewModel with ChangeNotifier {
 
   void setUsername(String value) {
     _username = value;
-    notifyListeners();
   }
 
   void setPassword(String value) {
     _password = value;
-    notifyListeners();
   }
 
   void toggleRememberMe(bool? value) async {
