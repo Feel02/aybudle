@@ -1,0 +1,26 @@
+{
+    "sourceFile": "android/app/src/debug/AndroidManifest.xml",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1742127560492,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742127581453,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,8 +3,9 @@\n          the Flutter tool needs it to communicate with the running application\r\n          to allow setting breakpoints, to provide hot reload, etc.\r\n     -->\r\n     <uses-permission android:name=\"android.permission.INTERNET\"/>\r\n+    <uses-permission android:name=\"android.permission.QUERY_ALL_PACKAGES\" />\r\n     <activity android:name=\"io.flutter.plugins.urllauncher.WebViewActivity\"\r\n            android:theme=\"@android:style/Theme.NoTitleBar.Fullscreen\"\r\n            android:exported=\"false\"/>\r\n </manifest>\r\n"
+                },
+                {
+                    "date": 1742127642399,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,8 +4,5 @@\n          to allow setting breakpoints, to provide hot reload, etc.\r\n     -->\r\n     <uses-permission android:name=\"android.permission.INTERNET\"/>\r\n     <uses-permission android:name=\"android.permission.QUERY_ALL_PACKAGES\" />\r\n-    <activity android:name=\"io.flutter.plugins.urllauncher.WebViewActivity\"\r\n-           android:theme=\"@android:style/Theme.NoTitleBar.Fullscreen\"\r\n-           android:exported=\"false\"/>\r\n </manifest>\r\n"
+                }
+            ],
+            "date": 1742127560492,
+            "name": "Commit-0",
+            "content": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\">\r\n    <!-- The INTERNET permission is required for development. Specifically,\r\n         the Flutter tool needs it to communicate with the running application\r\n         to allow setting breakpoints, to provide hot reload, etc.\r\n    -->\r\n    <uses-permission android:name=\"android.permission.INTERNET\"/>\r\n    <activity android:name=\"io.flutter.plugins.urllauncher.WebViewActivity\"\r\n           android:theme=\"@android:style/Theme.NoTitleBar.Fullscreen\"\r\n           android:exported=\"false\"/>\r\n</manifest>\r\n"
+        }
+    ]
+}

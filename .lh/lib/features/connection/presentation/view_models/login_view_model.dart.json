@@ -1,0 +1,26 @@
+{
+    "sourceFile": "lib/features/connection/presentation/view_models/login_view_model.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1742130429896,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742130542693,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import 'package:flutter/foundation.dart';\r\n import 'package:flutter_secure_storage/flutter_secure_storage.dart';\r\n-import '../../../domain/repositories/auth_repository.dart';\r\n-import '../../../data/models/auth_request.dart';\r\n+import '../../../login/domain/repositories/auth_repository.dart';\r\n+import '../../../login/data/models/auth_request.dart';\r\n \r\n class LoginViewModel with ChangeNotifier {\r\n   final AuthRepository repository;\r\n   final FlutterSecureStorage storage;\r\n"
+                },
+                {
+                    "date": 1742130855638,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n import 'package:flutter/foundation.dart';\r\n import 'package:flutter_secure_storage/flutter_secure_storage.dart';\r\n-import '../../../login/domain/repositories/auth_repository.dart';\r\n+import '../../../login/data/repositories/auth_repository.dart';\r\n import '../../../login/data/models/auth_request.dart';\r\n \r\n class LoginViewModel with ChangeNotifier {\r\n   final AuthRepository repository;\r\n"
+                }
+            ],
+            "date": 1742130429896,
+            "name": "Commit-0",
+            "content": "import 'package:flutter/foundation.dart';\r\nimport 'package:flutter_secure_storage/flutter_secure_storage.dart';\r\nimport '../../../domain/repositories/auth_repository.dart';\r\nimport '../../../data/models/auth_request.dart';\r\n\r\nclass LoginViewModel with ChangeNotifier {\r\n  final AuthRepository repository;\r\n  final FlutterSecureStorage storage;\r\n\r\n  bool _isLoading = false;\r\n  String _errorMessage = '';\r\n\r\n  bool get isLoading => _isLoading;\r\n  String get errorMessage => _errorMessage;\r\n\r\n  LoginViewModel({\r\n    required this.repository,\r\n    required this.storage,\r\n  });\r\n\r\n  Future<void> login({\r\n    required String baseUrl,\r\n    required String username,\r\n    required String password,\r\n  }) async {\r\n    _isLoading = true;\r\n    notifyListeners();\r\n\r\n    try {\r\n      final response = await repository.login(AuthRequest(\r\n        baseUrl: baseUrl,\r\n        username: username,\r\n        password: password,\r\n      ));\r\n\r\n      await storage.write(key: 'auth_token', value: response.token);\r\n      await storage.write(key: 'private_token', value: response.privateToken);\r\n      await storage.write(key: 'user_id', value: response.userId.toString());\r\n      \r\n      _errorMessage = '';\r\n    } catch (e) {\r\n      _errorMessage = e.toString();\r\n    } finally {\r\n      _isLoading = false;\r\n      notifyListeners();\r\n    }\r\n  }\r\n}"
+        }
+    ]
+}

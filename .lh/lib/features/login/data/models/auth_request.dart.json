@@ -1,0 +1,22 @@
+{
+    "sourceFile": "lib/features/login/data/models/auth_request.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1742130267874,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742130830300,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,17 +10,4 @@\n     required this.password,\r\n     this.service = 'moodle_mobile_app',\r\n   });\r\n }\r\n-\r\n-// features/login/data/models/auth_response.dart\r\n-class AuthResponse {\r\n-  final String token;\r\n-  final String privateToken;\r\n-  final int userId;\r\n-\r\n-  AuthResponse({\r\n-    required this.token,\r\n-    required this.privateToken,\r\n-    required this.userId,\r\n-  });\r\n-}\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1742130267874,
+            "name": "Commit-0",
+            "content": "class AuthRequest {\r\n  final String baseUrl;\r\n  final String username;\r\n  final String password;\r\n  final String service;\r\n\r\n  AuthRequest({\r\n    required this.baseUrl,\r\n    required this.username,\r\n    required this.password,\r\n    this.service = 'moodle_mobile_app',\r\n  });\r\n}\r\n\r\n// features/login/data/models/auth_response.dart\r\nclass AuthResponse {\r\n  final String token;\r\n  final String privateToken;\r\n  final int userId;\r\n\r\n  AuthResponse({\r\n    required this.token,\r\n    required this.privateToken,\r\n    required this.userId,\r\n  });\r\n}"
+        }
+    ]
+}

@@ -1,0 +1,66 @@
+{
+    "sourceFile": "lib/features/connection/presentation/view_models/connection_view_model.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 12,
+            "patches": [
+                {
+                    "date": 1742123303870,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742126434579,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n-      if (await canLaunch(_url)) {\r\n+      if (await canLaunchUrl(Uri.parse(_url))) {\r\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n       }\r\n"
+                },
+                {
+                    "date": 1742127374307,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,9 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n+      print('Connecting to $_url');\r\n       if (await canLaunchUrl(Uri.parse(_url))) {\r\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n"
+                },
+                {
+                    "date": 1742127427667,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,8 +23,11 @@\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n       }\r\n+      else{\r\n+        print('ERROR: Cannot launch URL');\r\n+      }\r\n       return false;\r\n     } catch (e) {\r\n       _isLoading = false;\r\n       notifyListeners();\r\n"
+                },
+                {
+                    "date": 1742127433208,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,9 +24,9 @@\n         notifyListeners();\r\n         return true;\r\n       }\r\n       else{\r\n-        print('ERROR: Cannot launch URL');\r\n+        print('ERRORERROR: Cannot launch URL');\r\n       }\r\n       return false;\r\n     } catch (e) {\r\n       _isLoading = false;\r\n"
+                },
+                {
+                    "date": 1742127607075,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n     notifyListeners();\r\n \r\n     try {\r\n       print('Connecting to $_url');\r\n-      if (await canLaunchUrl(Uri.parse(_url))) {\r\n+      if (await launch(_url)) {\r\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n       }\r\n"
+                },
+                {
+                    "date": 1742127924211,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n     notifyListeners();\r\n \r\n     try {\r\n       print('Connecting to $_url');\r\n-      if (await launch(_url)) {\r\n+      if (await canLaunchUrl(Uri.parse(_url))) {\r\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n       }\r\n"
+                },
+                {
+                    "date": 1742131872723,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,18 +17,19 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n-      print('Connecting to $_url');\r\n-      if (await canLaunchUrl(Uri.parse(_url))) {\r\n-        _isLoading = false;\r\n-        notifyListeners();\r\n-        return true;\r\n-      }\r\n-      else{\r\n-        print('ERRORERROR: Cannot launch URL');\r\n-      }\r\n-      return false;\r\n+      final response = await _dio.get(\r\n+        '$_url/login/config.php',\r\n+        options: Options(validateStatus: (status) => true),\r\n+      );\r\n+      \r\n+      // Verify it's a Moodle site\r\n+      final isMoodle = response.data.toString().contains('Moodle');\r\n+      \r\n+      _isLoading = false;\r\n+      notifyListeners();\r\n+      return isMoodle;\r\n     } catch (e) {\r\n       _isLoading = false;\r\n       notifyListeners();\r\n       return false;\r\n"
+                },
+                {
+                    "date": 1742131936971,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,5 @@\n+import 'package:dio/dio.dart';\r\n import 'package:flutter/foundation.dart';\r\n import 'package:url_launcher/url_launcher.dart';\r\n \r\n class ConnectionViewModel with ChangeNotifier {\r\n"
+                },
+                {
+                    "date": 1742132014653,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,8 +4,9 @@\n \r\n class ConnectionViewModel with ChangeNotifier {\r\n   String _url = '';\r\n   bool _isLoading = false;\r\n+  final Dio _dio = Dio();\r\n \r\n   String get url => _url;\r\n   bool get isLoading => _isLoading;\r\n \r\n"
+                },
+                {
+                    "date": 1742132215976,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,12 +1,10 @@\n-import 'package:dio/dio.dart';\r\n import 'package:flutter/foundation.dart';\r\n import 'package:url_launcher/url_launcher.dart';\r\n \r\n class ConnectionViewModel with ChangeNotifier {\r\n   String _url = '';\r\n   bool _isLoading = false;\r\n-  final Dio _dio = Dio();\r\n \r\n   String get url => _url;\r\n   bool get isLoading => _isLoading;\r\n \r\n@@ -19,19 +17,14 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n-      final response = await _dio.get(\r\n-        '$_url/login/config.php',\r\n-        options: Options(validateStatus: (status) => true),\r\n-      );\r\n-      \r\n-      // Verify it's a Moodle site\r\n-      final isMoodle = response.data.toString().contains('Moodle');\r\n-      \r\n-      _isLoading = false;\r\n-      notifyListeners();\r\n-      return isMoodle;\r\n+      if (await canLaunch(_url)) {\r\n+        _isLoading = false;\r\n+        notifyListeners();\r\n+        return true;\r\n+      }\r\n+      return false;\r\n     } catch (e) {\r\n       _isLoading = false;\r\n       notifyListeners();\r\n       return false;\r\n"
+                },
+                {
+                    "date": 1742132274401,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n-      if (await canLaunch(_url)) {\r\n+      if (await canLaunchUrl(_url)) {\r\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n       }\r\n"
+                },
+                {
+                    "date": 1742132283487,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     try {\r\n-      if (await canLaunchUrl(_url)) {\r\n+      if (await canLaunchUrl(Uri.parse(_url))) {\r\n         _isLoading = false;\r\n         notifyListeners();\r\n         return true;\r\n       }\r\n"
+                }
+            ],
+            "date": 1742123303869,
+            "name": "Commit-0",
+            "content": "import 'package:flutter/foundation.dart';\r\nimport 'package:url_launcher/url_launcher.dart';\r\n\r\nclass ConnectionViewModel with ChangeNotifier {\r\n  String _url = '';\r\n  bool _isLoading = false;\r\n\r\n  String get url => _url;\r\n  bool get isLoading => _isLoading;\r\n\r\n  void setUrl(String value) {\r\n    _url = value;\r\n    notifyListeners();\r\n  }\r\n\r\n  Future<bool> connectToSite() async {\r\n    _isLoading = true;\r\n    notifyListeners();\r\n\r\n    try {\r\n      if (await canLaunch(_url)) {\r\n        _isLoading = false;\r\n        notifyListeners();\r\n        return true;\r\n      }\r\n      return false;\r\n    } catch (e) {\r\n      _isLoading = false;\r\n      notifyListeners();\r\n      return false;\r\n    }\r\n  }\r\n}"
+        }
+    ]
+}

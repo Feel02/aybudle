@@ -1,0 +1,18 @@
+{
+    "sourceFile": "lib/features/login/data/repositories/auth_repository.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1742130799205,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1742130799205,
+            "name": "Commit-0",
+            "content": "import '../models/auth_request.dart';\r\nimport '../models/auth_response.dart';\r\n\r\nabstract class AuthRepository {\r\n  Future<AuthResponse> login(AuthRequest request);\r\n  Future<void> logout();\r\n}\r\n"
+        }
+    ]
+}

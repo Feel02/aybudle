@@ -1,0 +1,18 @@
+{
+    "sourceFile": "lib/features/login/domain/repositories/auth_repository.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1742130391208,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1742130391208,
+            "name": "Commit-0",
+            "content": "import '../models/auth_request.dart';\r\nimport '../models/auth_response.dart';\r\n\r\nabstract class AuthRepository {\r\n  Future<AuthResponse> login(AuthRequest request);\r\n  Future<void> logout();\r\n}\r\n\r\n// features/login/data/repositories/auth_repository_impl.dart\r\nimport 'package:dio/dio.dart';\r\nimport '../../domain/repositories/auth_repository.dart';\r\nimport '../datasources/auth_data_source.dart';\r\nimport '../models/auth_request.dart';\r\nimport '../models/auth_response.dart';\r\n\r\nclass AuthRepositoryImpl implements AuthRepository {\r\n  final AuthDataSource dataSource;\r\n\r\n  AuthRepositoryImpl({required this.dataSource});\r\n\r\n  @override\r\n  Future<AuthResponse> login(AuthRequest request) async {\r\n    try {\r\n      return await dataSource.authenticate(request);\r\n    } on DioException catch (e) {\r\n      throw Exception('Login failed: ${e.response?.data ?? e.message}');\r\n    }\r\n  }\r\n\r\n  @override\r\n  Future<void> logout() async {\r\n    // Implementation for token invalidation\r\n  }\r\n}"
+        }
+    ]
+}

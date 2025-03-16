@@ -1,0 +1,18 @@
+{
+    "sourceFile": "android/build.gradle.kts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1742125963376,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1742125963376,
+            "name": "Commit-0",
+            "content": "allprojects {\r\n    repositories {\r\n        google()\r\n        mavenCentral()\r\n    }\r\n}\r\n\r\nval newBuildDir: Directory = rootProject.layout.buildDirectory.dir(\"../../build\").get()\r\nrootProject.layout.buildDirectory.value(newBuildDir)\r\n\r\nsubprojects {\r\n    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)\r\n    project.layout.buildDirectory.value(newSubprojectBuildDir)\r\n}\r\nsubprojects {\r\n    project.evaluationDependsOn(\":app\")\r\n}\r\n\r\ntasks.register<Delete>(\"clean\") {\r\n    delete(rootProject.layout.buildDirectory)\r\n}\r\n"
+        }
+    ]
+}

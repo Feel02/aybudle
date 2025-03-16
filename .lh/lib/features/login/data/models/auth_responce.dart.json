@@ -1,0 +1,18 @@
+{
+    "sourceFile": "lib/features/login/data/models/auth_responce.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1742130825104,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1742130825104,
+            "name": "Commit-0",
+            "content": "class AuthResponse {\r\n  final String token;\r\n  final String privateToken;\r\n  final int userId;\r\n\r\n  AuthResponse({\r\n    required this.token,\r\n    required this.privateToken,\r\n    required this.userId,\r\n  });\r\n}"
+        }
+    ]
+}

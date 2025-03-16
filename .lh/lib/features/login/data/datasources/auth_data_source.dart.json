@@ -1,0 +1,18 @@
+{
+    "sourceFile": "lib/features/login/data/datasources/auth_data_source.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1742130312295,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1742130312295,
+            "name": "Commit-0",
+            "content": "import 'package:dio/dio.dart';\r\nimport '../models/auth_request.dart';\r\nimport '../models/auth_response.dart';\r\n\r\nclass AuthDataSource {\r\n  final Dio dio;\r\n\r\n  AuthDataSource(this.dio);\r\n\r\n  Future<AuthResponse> authenticate(AuthRequest request) async {\r\n    final response = await dio.post(\r\n      '${request.baseUrl}/login/token.php',\r\n      data: {\r\n        'username': request.username,\r\n        'password': request.password,\r\n        'service': request.service,\r\n      },\r\n    );\r\n\r\n    if (response.data['token'] == null) {\r\n      throw Exception('Authentication failed');\r\n    }\r\n\r\n    return AuthResponse(\r\n      token: response.data['token'],\r\n      privateToken: response.data['privatetoken'] ?? '',\r\n      userId: int.parse(response.data['userid']),\r\n    );\r\n  }\r\n}"
+        }
+    ]
+}
