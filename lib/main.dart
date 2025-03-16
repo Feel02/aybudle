@@ -1,4 +1,4 @@
-// main.dart
+import 'package:aybudle/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'features/connection/presentation/screens/connection_screen.dart';
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ConnectionViewModel()),
       ],
       child: MaterialApp(
-        title: 'Moodle Connect',
+        title: AppConstants.appName,
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,

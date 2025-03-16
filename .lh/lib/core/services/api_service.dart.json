@@ -3,11 +3,79 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 17,
             "patches": [
                 {
                     "date": 1742123178345,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742137397817,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,5 +10,27 @@\n     } catch (e) {\r\n       return false;\r\n     }\r\n   }\r\n-}\n\\ No newline at end of file\n+\r\n+  Future<bool> login(String baseUrl, String username, String password) async {\r\n+    try {\r\n+      // Assuming the Moodle login endpoint is at \"<baseUrl>/login/token.php\"\r\n+      final response = await _dio.post(\r\n+        \"$baseUrl/login/token.php\",\r\n+        data: {\r\n+          \"username\": username,\r\n+          \"password\": password,\r\n+          \"service\": \"moodle_mobile_app\",\r\n+        },\r\n+      );\r\n+\r\n+      // Check if login was successful (i.e., token exists)\r\n+      if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n+        return true;\r\n+      }\r\n+      return false;\r\n+    } catch (e) {\r\n+      return false;\r\n+    }\r\n+  }\r\n+}\r\n"
+                },
+                {
+                    "date": 1742137771598,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,9 +15,9 @@\n   Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n       // Assuming the Moodle login endpoint is at \"<baseUrl>/login/token.php\"\r\n       final response = await _dio.post(\r\n-        \"$baseUrl/login/token.php\",\r\n+        \"$baseUrl/login/index.php\",\r\n         data: {\r\n           \"username\": username,\r\n           \"password\": password,\r\n           \"service\": \"moodle_mobile_app\",\r\n"
+                },
+                {
+                    "date": 1742138806053,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,9 +15,9 @@\n   Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n       // Assuming the Moodle login endpoint is at \"<baseUrl>/login/token.php\"\r\n       final response = await _dio.post(\r\n-        \"$baseUrl/login/index.php\",\r\n+        \"$baseUrl/login/token.php\",\r\n         data: {\r\n           \"username\": username,\r\n           \"password\": password,\r\n           \"service\": \"moodle_mobile_app\",\r\n"
+                },
+                {
+                    "date": 1742138869579,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n         \"$baseUrl/login/token.php\",\r\n         data: {\r\n           \"username\": username,\r\n           \"password\": password,\r\n-          \"service\": \"moodle_mobile_app\",\r\n+          \"service\": 'moodle_mobile_app',\r\n         },\r\n       );\r\n \r\n       // Check if login was successful (i.e., token exists)\r\n"
+                },
+                {
+                    "date": 1742142125625,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n         \"$baseUrl/login/token.php\",\r\n         data: {\r\n           \"username\": username,\r\n           \"password\": password,\r\n-          \"service\": 'moodle_mobile_app',\r\n+          \"service\": \"moodle_mobile_app\",\r\n         },\r\n       );\r\n \r\n       // Check if login was successful (i.e., token exists)\r\n"
+                },
+                {
+                    "date": 1742152457828,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,19 +13,16 @@\n   }\r\n \r\n   Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n-      // Assuming the Moodle login endpoint is at \"<baseUrl>/login/token.php\"\r\n-      final response = await _dio.post(\r\n+      final response = await _dio.get(\r\n         \"$baseUrl/login/token.php\",\r\n         data: {\r\n           \"username\": username,\r\n           \"password\": password,\r\n           \"service\": \"moodle_mobile_app\",\r\n         },\r\n       );\r\n-\r\n-      // Check if login was successful (i.e., token exists)\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         return true;\r\n       }\r\n       return false;\r\n"
+                },
+                {
+                    "date": 1742152467704,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n         \"$baseUrl/login/token.php\",\r\n         data: {\r\n           \"username\": username,\r\n           \"password\": password,\r\n-          \"service\": \"moodle_mobile_app\",\r\n+          \"service\": 'moodle_mobile_app',\r\n         },\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         return true;\r\n"
+                },
+                {
+                    "date": 1742152491403,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,8 +22,9 @@\n           \"service\": 'moodle_mobile_app',\r\n         },\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n+        print(\"JPZSDFVJIOFVSJVDFJKLBDJJKJLBDFKDFBJLLJKBDFJKDFLB\");\r\n         return true;\r\n       }\r\n       return false;\r\n     } catch (e) {\r\n"
+                },
+                {
+                    "date": 1742152596439,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,14 +14,9 @@\n \r\n   Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n       final response = await _dio.get(\r\n-        \"$baseUrl/login/token.php\",\r\n-        data: {\r\n-          \"username\": username,\r\n-          \"password\": password,\r\n-          \"service\": 'moodle_mobile_app',\r\n-        },\r\n+        \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         print(\"JPZSDFVJIOFVSJVDFJKLBDJJKJLBDFKDFBJLLJKBDFJKDFLB\");\r\n         return true;\r\n"
+                },
+                {
+                    "date": 1742152784116,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,8 +13,9 @@\n   }\r\n \r\n   Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n+      print(\"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\");\r\n       final response = await _dio.get(\r\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n"
+                },
+                {
+                    "date": 1742153014237,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,9 @@\n       print(\"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\");\r\n       final response = await _dio.get(\r\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n+      print(response.data);\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         print(\"JPZSDFVJIOFVSJVDFJKLBDJJKJLBDFKDFBJLLJKBDFJKDFLB\");\r\n         return true;\r\n       }\r\n"
+                },
+                {
+                    "date": 1742154032232,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,8 @@\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       print(response.data);\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n-        print(\"JPZSDFVJIOFVSJVDFJKLBDJJKJLBDFKDFBJLLJKBDFJKDFLB\");\r\n         return true;\r\n       }\r\n       return false;\r\n     } catch (e) {\r\n"
+                },
+                {
+                    "date": 1742154045744,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,13 +13,11 @@\n   }\r\n \r\n   Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n-      print(\"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\");\r\n       final response = await _dio.get(\r\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n-      print(response.data);\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         return true;\r\n       }\r\n       return false;\r\n"
+                },
+                {
+                    "date": 1742154094794,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,13 +11,21 @@\n       return false;\r\n     }\r\n   }\r\n \r\n-  Future<bool> login(String baseUrl, String username, String password) async {\r\n+   Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n-      final response = await _dio.get(\r\n-        \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n+      // Assuming the Moodle login endpoint is at \"<baseUrl>/login/token.php\"\r\n+      final response = await _dio.post(\r\n+        \"$baseUrl/login/token.php\",\r\n+        data: {\r\n+          \"username\": username,\r\n+          \"password\": password,\r\n+          \"service\": \"moodle_mobile_app\",\r\n+        },\r\n       );\r\n+\r\n+      // Check if login was successful (i.e., token exists)\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         return true;\r\n       }\r\n       return false;\r\n"
+                },
+                {
+                    "date": 1742154164765,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,9 +19,9 @@\n         \"$baseUrl/login/token.php\",\r\n         data: {\r\n           \"username\": username,\r\n           \"password\": password,\r\n-          \"service\": \"moodle_mobile_app\",\r\n+          \"service\": 'moodle_mobile_app',\r\n         },\r\n       );\r\n \r\n       // Check if login was successful (i.e., token exists)\r\n"
+                },
+                {
+                    "date": 1742154229314,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,21 +11,13 @@\n       return false;\r\n     }\r\n   }\r\n \r\n-   Future<bool> login(String baseUrl, String username, String password) async {\r\n+  Future<bool> login(String baseUrl, String username, String password) async {\r\n     try {\r\n-      // Assuming the Moodle login endpoint is at \"<baseUrl>/login/token.php\"\r\n-      final response = await _dio.post(\r\n-        \"$baseUrl/login/token.php\",\r\n-        data: {\r\n-          \"username\": username,\r\n-          \"password\": password,\r\n-          \"service\": 'moodle_mobile_app',\r\n-        },\r\n+      final response = await _dio.get(\r\n+        \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n-\r\n-      // Check if login was successful (i.e., token exists)\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         return true;\r\n       }\r\n       return false;\r\n"
+                },
+                {
+                    "date": 1742154535828,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,9 @@\n       final response = await _dio.get(\r\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n+        print(response.data);\r\n         return true;\r\n       }\r\n       return false;\r\n     } catch (e) {\r\n"
                 }
             ],
             "date": 1742123178345,

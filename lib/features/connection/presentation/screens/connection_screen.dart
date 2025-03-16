@@ -1,8 +1,8 @@
 import 'package:aybudle/core/constants/app_constants.dart';
 import 'package:aybudle/features/connection/presentation/view_models/connection_view_model.dart';
+import 'package:aybudle/features/connection/presentation/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'webview_screen.dart';
 
 class ConnectionScreen extends StatelessWidget {
   const ConnectionScreen({super.key});
@@ -24,8 +24,16 @@ class ConnectionScreen extends StatelessWidget {
                   ),
                   onChanged: viewModel.setUrl,
                   keyboardType: TextInputType.url,
+                  controller: TextEditingController(text: viewModel.url),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
+                CheckboxListTile(
+                  title: const Text("Remember Site"),
+                  value: viewModel.rememberSite,
+                  onChanged: viewModel.toggleRememberSite,
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+                const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: viewModel.isLoading
                       ? null
@@ -34,14 +42,15 @@ class ConnectionScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => WebViewScreen(url: viewModel.url),
+                                builder: (_) =>
+                                    LoginScreen(baseUrl: viewModel.url),
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Invalid URL or connection failed'),
-                              ),
+                                  content: Text(
+                                      'Invalid URL or connection failed')),
                             );
                           }
                         },

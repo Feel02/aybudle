@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1742123677166,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742135868038,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n class AppConstants {\r\n   static const String appName = 'Moodle Connect';\r\n-  static const String defaultMoodleUrl = 'https://www.google.com';\r\n+  static const String defaultMoodleUrl = 'https://aybuzem.aybu.edu.tr';\r\n   static const String connectButtonText = 'Connect';\r\n   static const String urlHintText = 'Enter Moodle site URL';\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742137425616,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,5 +2,6 @@\n   static const String appName = 'Moodle Connect';\r\n   static const String defaultMoodleUrl = 'https://aybuzem.aybu.edu.tr';\r\n   static const String connectButtonText = 'Connect';\r\n   static const String urlHintText = 'Enter Moodle site URL';\r\n+  static const String loginButtonText = 'Login';\r\n }\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1742123677166,

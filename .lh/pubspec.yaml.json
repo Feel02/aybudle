@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 2,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1742123406616,
@@ -16,6 +16,10 @@
                 {
                     "date": 1742130156463,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,8 +33,10 @@\n   provider: ^6.1.1\r\n   webview_flutter: ^4.4.0\r\n   url_launcher: ^6.1.11\r\n   dio: ^5.3.2\r\n+  flutter_secure_storage: ^8.0.0\r\n+  flutter_dotenv: ^5.1.0\r\n \r\n   # The following adds the Cupertino Icons font to your application.\r\n   # Use with the CupertinoIcons class for iOS style icons.\r\n   cupertino_icons: ^1.0.8\r\n"
+                },
+                {
+                    "date": 1742154798281,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -35,8 +35,9 @@\n   url_launcher: ^6.1.11\r\n   dio: ^5.3.2\r\n   flutter_secure_storage: ^8.0.0\r\n   flutter_dotenv: ^5.1.0\r\n+  shared_preferences: ^2.0.15\r\n \r\n   # The following adds the Cupertino Icons font to your application.\r\n   # Use with the CupertinoIcons class for iOS style icons.\r\n   cupertino_icons: ^1.0.8\r\n"
                 }
             ],
             "date": 1742123406616,

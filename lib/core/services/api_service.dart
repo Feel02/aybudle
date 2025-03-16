@@ -11,4 +11,19 @@ class ApiService {
       return false;
     }
   }
+
+  Future<bool> login(String baseUrl, String username, String password) async {
+    try {
+      final response = await _dio.get(
+        "$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app",
+      );
+      if (response.statusCode == 200 && response.data["token"] != null) {
+        print(response.data);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }

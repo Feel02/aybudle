@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1742123338252,
@@ -40,6 +40,22 @@
                 {
                     "date": 1742132251871,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n+import 'package:aybudle/core/constants/app_constants.dart';\r\n+import 'package:aybudle/features/connection/presentation/view_models/connection_view_model.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:provider/provider.dart';\r\n-import 'core/constants/app_constants.dart';\r\n-import 'view_models/connection_view_model.dart';\r\n import 'webview_screen.dart';\r\n \r\n class ConnectionScreen extends StatelessWidget {\r\n   const ConnectionScreen({super.key});\r\n"
+                },
+                {
+                    "date": 1742137314311,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import 'package:aybudle/core/constants/app_constants.dart';\r\n import 'package:aybudle/features/connection/presentation/view_models/connection_view_model.dart';\r\n+import 'package:aybudle/features/connection/presentation/screens/login_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:provider/provider.dart';\r\n-import 'webview_screen.dart';\r\n \r\n class ConnectionScreen extends StatelessWidget {\r\n   const ConnectionScreen({super.key});\r\n \r\n@@ -33,9 +33,9 @@\n                           if (await viewModel.connectToSite()) {\r\n                             Navigator.push(\r\n                               context,\r\n                               MaterialPageRoute(\r\n-                                builder: (_) => WebViewScreen(url: viewModel.url),\r\n+                                builder: (_) => LoginScreen(baseUrl: viewModel.url),\r\n                               ),\r\n                             );\r\n                           } else {\r\n                             ScaffoldMessenger.of(context).showSnackBar(\r\n@@ -57,5 +57,5 @@\n         ),\r\n       ),\r\n     );\r\n   }\r\n-}\n\\ No newline at end of file\n+}\r\n"
+                },
+                {
+                    "date": 1742141323065,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -57,5 +57,5 @@\n         ),\r\n       ),\r\n     );\r\n   }\r\n-}\r\n+}\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742154371487,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,9 +24,17 @@\n                   ),\r\n                   onChanged: viewModel.setUrl,\r\n                   keyboardType: TextInputType.url,\r\n                 ),\r\n-                const SizedBox(height: 20),\r\n+                const SizedBox(height: 10),\r\n+                // Remember Site checkbox\r\n+                CheckboxListTile(\r\n+                  title: const Text(\"Remember Site\"),\r\n+                  value: viewModel.rememberSite,\r\n+                  onChanged: viewModel.toggleRememberSite,\r\n+                  controlAffinity: ListTileControlAffinity.leading,\r\n+                ),\r\n+                const SizedBox(height: 10),\r\n                 ElevatedButton(\r\n                   onPressed: viewModel.isLoading\r\n                       ? null\r\n                       : () async {\r\n@@ -57,5 +65,5 @@\n         ),\r\n       ),\r\n     );\r\n   }\r\n-}\n\\ No newline at end of file\n+}\r\n"
+                },
+                {
+                    "date": 1742154751378,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,11 +23,11 @@\n                     border: OutlineInputBorder(),\r\n                   ),\r\n                   onChanged: viewModel.setUrl,\r\n                   keyboardType: TextInputType.url,\r\n+                  controller: TextEditingController(text: viewModel.url),\r\n                 ),\r\n                 const SizedBox(height: 10),\r\n-                // Remember Site checkbox\r\n                 CheckboxListTile(\r\n                   title: const Text(\"Remember Site\"),\r\n                   value: viewModel.rememberSite,\r\n                   onChanged: viewModel.toggleRememberSite,\r\n@@ -41,16 +41,17 @@\n                           if (await viewModel.connectToSite()) {\r\n                             Navigator.push(\r\n                               context,\r\n                               MaterialPageRoute(\r\n-                                builder: (_) => LoginScreen(baseUrl: viewModel.url),\r\n+                                builder: (_) =>\r\n+                                    LoginScreen(baseUrl: viewModel.url),\r\n                               ),\r\n                             );\r\n                           } else {\r\n                             ScaffoldMessenger.of(context).showSnackBar(\r\n                               const SnackBar(\r\n-                                content: Text('Invalid URL or connection failed'),\r\n-                              ),\r\n+                                  content: Text(\r\n+                                      'Invalid URL or connection failed')),\r\n                             );\r\n                           }\r\n                         },\r\n                   child: const Text(AppConstants.connectButtonText),\r\n"
                 }
             ],
             "date": 1742123338252,
