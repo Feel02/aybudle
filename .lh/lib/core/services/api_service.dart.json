@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 17,
+            "activePatchIndex": 21,
             "patches": [
                 {
                     "date": 1742123178345,
@@ -76,6 +76,22 @@
                 {
                     "date": 1742154535828,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,9 @@\n       final response = await _dio.get(\r\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n+        print(response.data);\r\n         return true;\r\n       }\r\n       return false;\r\n     } catch (e) {\r\n"
+                },
+                {
+                    "date": 1742160120599,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+import 'dart:ffi';\r\n+\r\n import 'package:dio/dio.dart';\r\n \r\n class ApiService {\r\n   final Dio _dio = Dio();\r\n@@ -11,19 +13,19 @@\n       return false;\r\n     }\r\n   }\r\n \r\n-  Future<bool> login(String baseUrl, String username, String password) async {\r\n+  Future<List> login(String baseUrl, String username, String password) async {\r\n     try {\r\n       final response = await _dio.get(\r\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         print(response.data);\r\n-        return true;\r\n+        return [true, response.data[\"token\"]];\r\n       }\r\n-      return false;\r\n+      return [false,null];\r\n     } catch (e) {\r\n-      return false;\r\n+      return [false,null];\r\n     }\r\n   }\r\n }\r\n"
+                },
+                {
+                    "date": 1742160895026,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,9 @@\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         print(response.data);\r\n-        return [true, response.data[\"token\"]];\r\n+        return [true, response.data[\"private_token\"]];\r\n       }\r\n       return [false,null];\r\n     } catch (e) {\r\n       return [false,null];\r\n"
+                },
+                {
+                    "date": 1742160903747,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,9 @@\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         print(response.data);\r\n-        return [true, response.data[\"private_token\"]];\r\n+        return [true, response.data[\"privatetoken\"]];\r\n       }\r\n       return [false,null];\r\n     } catch (e) {\r\n       return [false,null];\r\n"
+                },
+                {
+                    "date": 1742160952209,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,9 @@\n         \"$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app\",\r\n       );\r\n       if (response.statusCode == 200 && response.data[\"token\"] != null) {\r\n         print(response.data);\r\n-        return [true, response.data[\"privatetoken\"]];\r\n+        return [true, response.data[\"token\"]];\r\n       }\r\n       return [false,null];\r\n     } catch (e) {\r\n       return [false,null];\r\n"
                 }
             ],
             "date": 1742123178345,

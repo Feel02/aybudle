@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 12,
+            "activePatchIndex": 19,
             "patches": [
                 {
                     "date": 1742130429896,
@@ -56,6 +56,34 @@
                 {
                     "date": 1742157969953,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,14 +21,12 @@\n   }\r\n \r\n   void setUsername(String value) {\r\n     _username = value;\r\n-    notifyListeners();\r\n   }\r\n \r\n   void setPassword(String value) {\r\n     _password = value;\r\n-    notifyListeners();\r\n   }\r\n \r\n   void toggleRememberMe(bool? value) async {\r\n     _rememberMe = value ?? false;\r\n"
+                },
+                {
+                    "date": 1742159922556,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,8 +54,9 @@\n   Future<bool> login() async {\r\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n+    String token = '';\r\n     bool result = await _apiService.login(baseUrl, _username, _password);\r\n \r\n     _isLoading = false;\r\n     notifyListeners();\r\n"
+                },
+                {
+                    "date": 1742160146048,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+import 'dart:ffi';\r\n+\r\n import 'package:flutter/foundation.dart';\r\n import 'package:shared_preferences/shared_preferences.dart';\r\n import 'package:aybudle/core/services/api_service.dart';\r\n \r\n@@ -54,18 +56,17 @@\n   Future<bool> login() async {\r\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n-    String token = '';\r\n-    bool result = await _apiService.login(baseUrl, _username, _password);\r\n+    List result = await _apiService.login(baseUrl, _username, _password);\r\n \r\n     _isLoading = false;\r\n     notifyListeners();\r\n \r\n-    if (_rememberMe && result) {\r\n+    if (_rememberMe && result[0]) {\r\n       final prefs = await SharedPreferences.getInstance();\r\n       await prefs.setString('rememberedUsername', _username);\r\n       await prefs.setString('rememberedPassword', _password);\r\n     }\r\n-    return result;\r\n+    return result[0];\r\n   }\r\n }\r\n"
+                },
+                {
+                    "date": 1742160163682,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,8 +9,9 @@\n   final ApiService _apiService = ApiService();\r\n \r\n   String _username = '';\r\n   String _password = '';\r\n+  String _token = '';\r\n   bool _isLoading = false;\r\n   bool _rememberMe = false;\r\n \r\n   String get username => _username;\r\n"
+                },
+                {
+                    "date": 1742160173638,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,8 +30,12 @@\n   void setPassword(String value) {\r\n     _password = value;\r\n   }\r\n \r\n+  String getToken() {\r\n+    return _token;\r\n+  }\r\n+\r\n   void toggleRememberMe(bool? value) async {\r\n     _rememberMe = value ?? false;\r\n     notifyListeners();\r\n     // If disabling \"Remember Me\", clear saved credentials\r\n"
+                },
+                {
+                    "date": 1742160183909,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,9 +62,10 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     List result = await _apiService.login(baseUrl, _username, _password);\r\n-\r\n+    _token = result[1];\r\n+    \r\n     _isLoading = false;\r\n     notifyListeners();\r\n \r\n     if (_rememberMe && result[0]) {\r\n"
+                },
+                {
+                    "date": 1742160759080,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,10 +62,10 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     List result = await _apiService.login(baseUrl, _username, _password);\r\n-    _token = result[1];\r\n-    \r\n+    _token = result[1]['token'];\r\n+\r\n     _isLoading = false;\r\n     notifyListeners();\r\n \r\n     if (_rememberMe && result[0]) {\r\n"
+                },
+                {
+                    "date": 1742160873969,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,9 +62,9 @@\n     _isLoading = true;\r\n     notifyListeners();\r\n \r\n     List result = await _apiService.login(baseUrl, _username, _password);\r\n-    _token = result[1]['token'];\r\n+    _token = result[1];\r\n \r\n     _isLoading = false;\r\n     notifyListeners();\r\n \r\n"
                 }
             ],
             "date": 1742130429896,

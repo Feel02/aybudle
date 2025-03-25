@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1742122978910,
@@ -12,6 +12,10 @@
                 {
                     "date": 1742137095992,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-// main.dart\r\n+import 'package:aybudle/core/constants/app_constants.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:provider/provider.dart';\r\n import 'features/connection/presentation/screens/connection_screen.dart';\r\n import 'features/connection/presentation/view_models/connection_view_model.dart';\r\n@@ -17,14 +17,14 @@\n       providers: [\r\n         ChangeNotifierProvider(create: (_) => ConnectionViewModel()),\r\n       ],\r\n       child: MaterialApp(\r\n-        title: 'Moodle Connect',\r\n+        title: AppConstants.appName,\r\n         theme: ThemeData(\r\n           primarySwatch: Colors.blue,\r\n           visualDensity: VisualDensity.adaptivePlatformDensity,\r\n         ),\r\n         home: const ConnectionScreen(),\r\n       ),\r\n     );\r\n   }\r\n\\ No newline at end of file\n-}\n+}\r\n"
+                },
+                {
+                    "date": 1742223468292,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import 'package:aybudle/core/constants/app_constants.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:provider/provider.dart';\r\n-import 'features/connection/presentation/screens/connection_screen.dart';\r\n-import 'features/connection/presentation/view_models/connection_view_model.dart';\r\n+import 'features/connection/screens/connection_screen.dart';\r\n+import 'features/connection/view_models/connection_view_model.dart';\r\n \r\n void main() {\r\n   runApp(const MyApp());\r\n }\r\n"
                 }
             ],
             "date": 1742122978910,

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:aybudle/core/services/api_service.dart';
@@ -8,6 +10,7 @@ class LoginViewModel with ChangeNotifier {
 
   String _username = '';
   String _password = '';
+  String _token = '';
   bool _isLoading = false;
   bool _rememberMe = false;
 
@@ -26,6 +29,10 @@ class LoginViewModel with ChangeNotifier {
 
   void setPassword(String value) {
     _password = value;
+  }
+
+  String getToken() {
+    return _token;
   }
 
   void toggleRememberMe(bool? value) async {
@@ -55,16 +62,17 @@ class LoginViewModel with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    bool result = await _apiService.login(baseUrl, _username, _password);
+    List result = await _apiService.login(baseUrl, _username, _password);
+    _token = result[1];
 
     _isLoading = false;
     notifyListeners();
 
-    if (_rememberMe && result) {
+    if (_rememberMe && result[0]) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('rememberedUsername', _username);
       await prefs.setString('rememberedPassword', _password);
     }
-    return result;
+    return result[0];
   }
 }

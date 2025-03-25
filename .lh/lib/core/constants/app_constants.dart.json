@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 11,
             "patches": [
                 {
                     "date": 1742123677166,
@@ -20,6 +20,38 @@
                 {
                     "date": 1742158083015,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n class AppConstants {\r\n-  static const String appName = 'Moodle Connect';\r\n+  static const String appName = 'Aybudle Connect';\r\n   static const String defaultMoodleUrl = 'https://aybuzem.aybu.edu.tr';\r\n   static const String connectButtonText = 'Connect';\r\n   static const String urlHintText = 'Enter Moodle site URL';\r\n   static const String loginButtonText = 'Login';\r\n"
+                },
+                {
+                    "date": 1742223382785,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,5 +3,7 @@\n   static const String defaultMoodleUrl = 'https://aybuzem.aybu.edu.tr';\r\n   static const String connectButtonText = 'Connect';\r\n   static const String urlHintText = 'Enter Moodle site URL';\r\n   static const String loginButtonText = 'Login';\r\n+  static const String coursesScreenTitle = 'Courses';\r\n+  static const String rememberMeText = 'Remember Me';\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742223390809,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,5 +5,6 @@\n   static const String urlHintText = 'Enter Moodle site URL';\r\n   static const String loginButtonText = 'Login';\r\n   static const String coursesScreenTitle = 'Courses';\r\n   static const String rememberMeText = 'Remember Me';\r\n+  static const String rememberSiteText = 'Remember Site';\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742223401839,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,5 +6,10 @@\n   static const String loginButtonText = 'Login';\r\n   static const String coursesScreenTitle = 'Courses';\r\n   static const String rememberMeText = 'Remember Me';\r\n   static const String rememberSiteText = 'Remember Site';\r\n+  static const String loginFailedText = 'Login Failed';\r\n+  static const String invalidUrlText = 'Invalid URL or connection failed';\r\n+  static const String logoutText = 'Logout';\r\n+  static const String noCoursesText = 'No courses found';\r\n+  static const String noContentsText = 'No contents available.';\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742224924376,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,5 +11,6 @@\n   static const String invalidUrlText = 'Invalid URL or connection failed';\r\n   static const String logoutText = 'Logout';\r\n   static const String noCoursesText = 'No courses found';\r\n   static const String noContentsText = 'No contents available.';\r\n+  static const String invalidUrlMessage = 'Invalid URL or connection failed';\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742224938047,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,6 +11,7 @@\n   static const String invalidUrlText = 'Invalid URL or connection failed';\r\n   static const String logoutText = 'Logout';\r\n   static const String noCoursesText = 'No courses found';\r\n   static const String noContentsText = 'No contents available.';\r\n-  static const String invalidUrlMessage = 'Invalid URL or connection failed';\r\n+  static const String invalidUrlText = 'Invalid URL or connection failed';\r\n+  static const String invalidCredentialsText = 'Invalid username or password';\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742225025985,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,8 +3,9 @@\n   static const String defaultMoodleUrl = 'https://aybuzem.aybu.edu.tr';\r\n   static const String connectButtonText = 'Connect';\r\n   static const String urlHintText = 'Enter Moodle site URL';\r\n   static const String loginButtonText = 'Login';\r\n+  static const String loginText = 'Login';\r\n   static const String coursesScreenTitle = 'Courses';\r\n   static const String rememberMeText = 'Remember Me';\r\n   static const String rememberSiteText = 'Remember Site';\r\n   static const String loginFailedText = 'Login Failed';\r\n"
+                },
+                {
+                    "date": 1742225036851,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,7 +12,6 @@\n   static const String invalidUrlText = 'Invalid URL or connection failed';\r\n   static const String logoutText = 'Logout';\r\n   static const String noCoursesText = 'No courses found';\r\n   static const String noContentsText = 'No contents available.';\r\n-  static const String invalidUrlText = 'Invalid URL or connection failed';\r\n   static const String invalidCredentialsText = 'Invalid username or password';\r\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1742225071565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,8 +4,10 @@\n   static const String connectButtonText = 'Connect';\r\n   static const String urlHintText = 'Enter Moodle site URL';\r\n   static const String loginButtonText = 'Login';\r\n   static const String loginText = 'Login';\r\n+  static const String usernameText = 'Username';\r\n+  static const String passwordText = 'Password';\r\n   static const String coursesScreenTitle = 'Courses';\r\n   static const String rememberMeText = 'Remember Me';\r\n   static const String rememberSiteText = 'Remember Site';\r\n   static const String loginFailedText = 'Login Failed';\r\n"
                 }
             ],
             "date": 1742123677166,

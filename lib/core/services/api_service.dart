@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dio/dio.dart';
 
 class ApiService {
@@ -12,18 +14,18 @@ class ApiService {
     }
   }
 
-  Future<bool> login(String baseUrl, String username, String password) async {
+  Future<List> login(String baseUrl, String username, String password) async {
     try {
       final response = await _dio.get(
         "$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app",
       );
       if (response.statusCode == 200 && response.data["token"] != null) {
         print(response.data);
-        return true;
+        return [true, response.data["token"]];
       }
-      return false;
+      return [false,null];
     } catch (e) {
-      return false;
+      return [false,null];
     }
   }
 }

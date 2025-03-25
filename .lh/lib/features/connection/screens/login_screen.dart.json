@@ -1,0 +1,38 @@
+{
+    "sourceFile": "lib/features/connection/screens/login_screen.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 5,
+            "patches": [
+                {
+                    "date": 1742223468248,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742225002253,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n     return ChangeNotifierProvider<LoginViewModel>(\r\n       create: (_) => LoginViewModel(baseUrl),\r\n       child: Scaffold(\r\n         appBar: AppBar(\r\n-          title: const Text(\"Login\"),\r\n+          title: const Text(AppConstants.loginText),\r\n         ),\r\n         body: Consumer<LoginViewModel>(\r\n           builder: (context, viewModel, child) {\r\n             return Padding(\r\n"
+                },
+                {
+                    "date": 1742225062676,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,9 @@\n               child: Column(\r\n                 children: [\r\n                   TextField(\r\n                     decoration: const InputDecoration(\r\n-                      labelText: \"Username\",\r\n+                      labelText: AppConstants.usernameText,\r\n                       border: OutlineInputBorder(),\r\n                     ),\r\n                     onChanged: viewModel.setUsername,\r\n                     controller:\r\n"
+                },
+                {
+                    "date": 1742225078536,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,9 +33,9 @@\n                   ),\r\n                   const SizedBox(height: 20),\r\n                   TextField(\r\n                     decoration: const InputDecoration(\r\n-                      labelText: \"Password\",\r\n+                      labelText: AppConstants.passwordText,\r\n                       border: OutlineInputBorder(),\r\n                     ),\r\n                     obscureText: true,\r\n                     onChanged: viewModel.setPassword,\r\n"
+                },
+                {
+                    "date": 1742225084288,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,9 +43,9 @@\n                         TextEditingController(text: viewModel.password),\r\n                   ),\r\n                   const SizedBox(height: 10),\r\n                   CheckboxListTile(\r\n-                    title: const Text(\"Remember Me\"),\r\n+                    title: const Text(AppConstants.rememberMeText),\r\n                     value: viewModel.rememberMe,\r\n                     onChanged: viewModel.toggleRememberMe,\r\n                     controlAffinity: ListTileControlAffinity.leading,\r\n                   ),\r\n"
+                },
+                {
+                    "date": 1742225090760,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -64,9 +64,9 @@\n                               );\r\n                             } else {\r\n                               ScaffoldMessenger.of(context)\r\n                                   .showSnackBar(const SnackBar(\r\n-                                      content: Text(\"Login Failed\")));\r\n+                                      content: Text(AppConstants.loginFailedText)));\r\n                             }\r\n                           },\r\n                     child: const Text(AppConstants.loginButtonText),\r\n                   ),\r\n"
+                }
+            ],
+            "date": 1742223468248,
+            "name": "Commit-0",
+            "content": "import 'package:aybudle/core/constants/app_constants.dart';\r\nimport 'package:aybudle/features/connection/screens/post_login_screen.dart';\r\nimport 'package:aybudle/features/connection/view_models/login_view_model.dart';\r\nimport 'package:flutter/material.dart';\r\nimport 'package:provider/provider.dart';\r\n\r\nclass LoginScreen extends StatelessWidget {\r\n  final String baseUrl;\r\n  const LoginScreen({Key? key, required this.baseUrl}) : super(key: key);\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return ChangeNotifierProvider<LoginViewModel>(\r\n      create: (_) => LoginViewModel(baseUrl),\r\n      child: Scaffold(\r\n        appBar: AppBar(\r\n          title: const Text(\"Login\"),\r\n        ),\r\n        body: Consumer<LoginViewModel>(\r\n          builder: (context, viewModel, child) {\r\n            return Padding(\r\n              padding: const EdgeInsets.all(16.0),\r\n              child: Column(\r\n                children: [\r\n                  TextField(\r\n                    decoration: const InputDecoration(\r\n                      labelText: \"Username\",\r\n                      border: OutlineInputBorder(),\r\n                    ),\r\n                    onChanged: viewModel.setUsername,\r\n                    controller:\r\n                        TextEditingController(text: viewModel.username),\r\n                  ),\r\n                  const SizedBox(height: 20),\r\n                  TextField(\r\n                    decoration: const InputDecoration(\r\n                      labelText: \"Password\",\r\n                      border: OutlineInputBorder(),\r\n                    ),\r\n                    obscureText: true,\r\n                    onChanged: viewModel.setPassword,\r\n                    controller:\r\n                        TextEditingController(text: viewModel.password),\r\n                  ),\r\n                  const SizedBox(height: 10),\r\n                  CheckboxListTile(\r\n                    title: const Text(\"Remember Me\"),\r\n                    value: viewModel.rememberMe,\r\n                    onChanged: viewModel.toggleRememberMe,\r\n                    controlAffinity: ListTileControlAffinity.leading,\r\n                  ),\r\n                  const SizedBox(height: 20),\r\n                  ElevatedButton(\r\n                    onPressed: viewModel.isLoading\r\n                        ? null\r\n                        : () async {\r\n                            bool success = await viewModel.login();\r\n                            if (success) {\r\n                              Navigator.pushReplacement(\r\n                                context,\r\n                                MaterialPageRoute(\r\n                                  builder: (_) => PostLoginScreen(baseUrl: baseUrl, token: viewModel.getToken()),\r\n                                ),\r\n                              );\r\n                            } else {\r\n                              ScaffoldMessenger.of(context)\r\n                                  .showSnackBar(const SnackBar(\r\n                                      content: Text(\"Login Failed\")));\r\n                            }\r\n                          },\r\n                    child: const Text(AppConstants.loginButtonText),\r\n                  ),\r\n                  if (viewModel.isLoading) ...[\r\n                    const SizedBox(height: 20),\r\n                    const CircularProgressIndicator(),\r\n                  ],\r\n                ],\r\n              ),\r\n            );\r\n          },\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n}\r\n"
+        }
+    ]
+}

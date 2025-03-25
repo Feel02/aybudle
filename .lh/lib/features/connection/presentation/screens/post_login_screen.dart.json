@@ -1,0 +1,26 @@
+{
+    "sourceFile": "lib/features/connection/presentation/screens/post_login_screen.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1742159642170,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742159731433,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,13 +1,13 @@\n import 'package:flutter/material.dart';\r\n import 'webview_screen.dart';\r\n import 'courses_screen.dart';\r\n \r\n-class PostLoginChoiceScreen extends StatelessWidget {\r\n+class PostLoginScreen extends StatelessWidget {\r\n   final String baseUrl;\r\n   final String token; // token acquired after login\r\n \r\n-  const PostLoginChoiceScreen({\r\n+  const PostLoginScreen({\r\n     Key? key,\r\n     required this.baseUrl,\r\n     required this.token,\r\n   }) : super(key: key);\r\n"
+                },
+                {
+                    "date": 1742223298493,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,10 @@\n import 'package:flutter/material.dart';\r\n-import 'webview_screen.dart';\r\n import 'courses_screen.dart';\r\n \r\n class PostLoginScreen extends StatelessWidget {\r\n   final String baseUrl;\r\n-  final String token; // token acquired after login\r\n+  final String token;\r\n \r\n   const PostLoginScreen({\r\n     Key? key,\r\n     required this.baseUrl,\r\n@@ -13,44 +12,8 @@\n   }) : super(key: key);\r\n \r\n   @override\r\n   Widget build(BuildContext context) {\r\n-    return Scaffold(\r\n-      appBar: AppBar(\r\n-        title: const Text('Choose Option'),\r\n-      ),\r\n-      body: Center(\r\n-        child: Column(\r\n-          mainAxisAlignment: MainAxisAlignment.center,\r\n-          children: [\r\n-            ElevatedButton(\r\n-              onPressed: () {\r\n-                // Open the URL in a WebView.\r\n-                Navigator.push(\r\n-                  context,\r\n-                  MaterialPageRoute(\r\n-                    builder: (_) => WebViewScreen(url: baseUrl),\r\n-                  ),\r\n-                );\r\n-              },\r\n-              child: const Text('Open Site in Browser'),\r\n-            ),\r\n-            const SizedBox(height: 20),\r\n-            ElevatedButton(\r\n-              onPressed: () {\r\n-                // Stay in the app and show the courses screen.\r\n-                Navigator.push(\r\n-                  context,\r\n-                  MaterialPageRoute(\r\n-                    builder: (_) =>\r\n-                        CoursesScreen(baseUrl: baseUrl, token: token),\r\n-                  ),\r\n-                );\r\n-              },\r\n-              child: const Text('Use App'),\r\n-            ),\r\n-          ],\r\n-        ),\r\n-      ),\r\n-    );\r\n+    // Directly display the courses screen which will fetch and show courses details.\r\n+    return CoursesScreen(baseUrl: baseUrl, token: token);\r\n\\ No newline at end of file\n   }\r\n-}\n+}\r\n"
+                }
+            ],
+            "date": 1742159642170,
+            "name": "Commit-0",
+            "content": "import 'package:flutter/material.dart';\r\nimport 'webview_screen.dart';\r\nimport 'courses_screen.dart';\r\n\r\nclass PostLoginChoiceScreen extends StatelessWidget {\r\n  final String baseUrl;\r\n  final String token; // token acquired after login\r\n\r\n  const PostLoginChoiceScreen({\r\n    Key? key,\r\n    required this.baseUrl,\r\n    required this.token,\r\n  }) : super(key: key);\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Scaffold(\r\n      appBar: AppBar(\r\n        title: const Text('Choose Option'),\r\n      ),\r\n      body: Center(\r\n        child: Column(\r\n          mainAxisAlignment: MainAxisAlignment.center,\r\n          children: [\r\n            ElevatedButton(\r\n              onPressed: () {\r\n                // Open the URL in a WebView.\r\n                Navigator.push(\r\n                  context,\r\n                  MaterialPageRoute(\r\n                    builder: (_) => WebViewScreen(url: baseUrl),\r\n                  ),\r\n                );\r\n              },\r\n              child: const Text('Open Site in Browser'),\r\n            ),\r\n            const SizedBox(height: 20),\r\n            ElevatedButton(\r\n              onPressed: () {\r\n                // Stay in the app and show the courses screen.\r\n                Navigator.push(\r\n                  context,\r\n                  MaterialPageRoute(\r\n                    builder: (_) =>\r\n                        CoursesScreen(baseUrl: baseUrl, token: token),\r\n                  ),\r\n                );\r\n              },\r\n              child: const Text('Use App'),\r\n            ),\r\n          ],\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n}"
+        }
+    ]
+}

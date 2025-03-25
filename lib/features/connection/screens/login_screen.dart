@@ -1,5 +1,6 @@
 import 'package:aybudle/core/constants/app_constants.dart';
-import 'package:aybudle/features/connection/presentation/view_models/login_view_model.dart';
+import 'package:aybudle/features/connection/screens/post_login_screen.dart';
+import 'package:aybudle/features/connection/view_models/login_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,7 @@ class LoginScreen extends StatelessWidget {
       create: (_) => LoginViewModel(baseUrl),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Login"),
+          title: const Text(AppConstants.loginText),
         ),
         body: Consumer<LoginViewModel>(
           builder: (context, viewModel, child) {
@@ -23,7 +24,7 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   TextField(
                     decoration: const InputDecoration(
-                      labelText: "Username",
+                      labelText: AppConstants.usernameText,
                       border: OutlineInputBorder(),
                     ),
                     onChanged: viewModel.setUsername,
@@ -33,7 +34,7 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   TextField(
                     decoration: const InputDecoration(
-                      labelText: "Password",
+                      labelText: AppConstants.passwordText,
                       border: OutlineInputBorder(),
                     ),
                     obscureText: true,
@@ -43,7 +44,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   CheckboxListTile(
-                    title: const Text("Remember Me"),
+                    title: const Text(AppConstants.rememberMeText),
                     value: viewModel.rememberMe,
                     onChanged: viewModel.toggleRememberMe,
                     controlAffinity: ListTileControlAffinity.leading,
@@ -55,15 +56,16 @@ class LoginScreen extends StatelessWidget {
                         : () async {
                             bool success = await viewModel.login();
                             if (success) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                      content:
-                                          Text("Login Successful!")));
-                              // Navigate to dashboard or next screen here
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PostLoginScreen(baseUrl: baseUrl, token: viewModel.getToken()),
+                                ),
+                              );
                             } else {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(const SnackBar(
-                                      content: Text("Login Failed")));
+                                      content: Text(AppConstants.loginFailedText)));
                             }
                           },
                     child: const Text(AppConstants.loginButtonText),

@@ -1,8 +1,8 @@
 import 'package:aybudle/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'features/connection/presentation/screens/connection_screen.dart';
-import 'features/connection/presentation/view_models/connection_view_model.dart';
+import 'features/connection/screens/connection_screen.dart';
+import 'features/connection/view_models/connection_view_model.dart';
 
 void main() {
   runApp(const MyApp());
