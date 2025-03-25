@@ -1,5 +1,9 @@
+import 'package:aybudle/core/constants/app_constants.dart';
+import 'package:aybudle/features/connection/screens/connection_screen.dart';
+import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CoursesScreen extends StatefulWidget {
   final String baseUrl;
@@ -147,9 +151,27 @@ class _CoursesScreenState extends State<CoursesScreen> {
                   children: (section['modules'] as List<dynamic>).map<Widget>((module) {
                     return ListTile(
                       title: Text(module['name'] ?? 'Unnamed Module'),
-                      subtitle: Text(
-                        'Type: ${module['modname']}, Visible: ${module['visible']}',
-                      ),
+                      subtitle: Text('Type: ${module['modname']}, Visible: ${module['visible']}'),
+                      onTap: () {
+                        if (module['modname'] == 'forum') {
+                          // Navigate to ForumDiscussionsScreen using the token and forum id (module['instance'])
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ForumDiscussionsScreen(
+                                baseUrl: widget.baseUrl,
+                                token: widget.token,
+                                forumId: module['instance'],
+                              ),
+                            ),
+                          );
+                        } else {
+                          // For other module types, you can add similar logic or a fallback.
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('This module type is not supported yet.')),
+                          );
+                        }
+                      },
                     );
                   }).toList(),
                 ),
@@ -170,11 +192,37 @@ class _CoursesScreenState extends State<CoursesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Courses Details'),
+        // In your CoursesScreen's AppBar logout button:
+        leading: IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () async {
+            final prefs = await SharedPreferences.getInstance();
+            // Check if "Remember Me" is enabled.
+            bool rememberMe = prefs.getBool('rememberMeEnabled') ?? false;
+            
+            if (!rememberMe) {
+              // Clear everything if the user did NOT choose "Remember Me".
+              await prefs.remove('rememberedUsername');
+              await prefs.remove('rememberedPassword');
+              await prefs.remove('rememberedSite');
+            } else {
+              // If "Remember Me" is enabled, clear only session-related data (e.g., token)
+              await prefs.remove('userToken');
+              // Optionally, you can update other session flags as needed.
+            }
+            
+            // Navigate back to ConnectionScreen (clearing the navigation stack)
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const ConnectionScreen()),
+              (route) => false,
+            );
+          },
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _coursesDetails.isEmpty
-              ? const Center(child: Text('No courses found'))
+              ? const Center(child: Text(AppConstants.noCoursesText))
               : ListView.builder(
                   itemCount: _coursesDetails.length,
                   itemBuilder: (context, index) {
@@ -183,4 +231,5 @@ class _CoursesScreenState extends State<CoursesScreen> {
                 ),
     );
   }
+
 }

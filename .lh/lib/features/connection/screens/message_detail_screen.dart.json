@@ -1,0 +1,18 @@
+{
+    "sourceFile": "lib/features/connection/screens/message_detail_screen.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1742909728637,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1742909728637,
+            "name": "Commit-0",
+            "content": "import 'package:flutter/material.dart';\r\nimport 'package:webview_flutter/webview_flutter.dart';\r\n\r\nclass MessageDetailScreen extends StatefulWidget {\r\n  final Map<String, dynamic> module;\r\n\r\n  const MessageDetailScreen({Key? key, required this.module}) : super(key: key);\r\n\r\n  @override\r\n  State<MessageDetailScreen> createState() => _MessageDetailScreenState();\r\n}\r\n\r\nclass _MessageDetailScreenState extends State<MessageDetailScreen> {\r\n  late final WebViewController _controller;\r\n\r\n  @override\r\n  void initState() {\r\n    super.initState();\r\n    _controller = WebViewController()\r\n      ..setJavaScriptMode(JavaScriptMode.unrestricted)\r\n      ..loadRequest(Uri.parse(widget.module['url']));\r\n  }\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Scaffold(\r\n      appBar: AppBar(\r\n        title: Text(widget.module['name'] ?? 'Message Detail'),\r\n      ),\r\n      body: WebViewWidget(controller: _controller),\r\n    );\r\n  }\r\n}\r\n"
+        }
+    ]
+}

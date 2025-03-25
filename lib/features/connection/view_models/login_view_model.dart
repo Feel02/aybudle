@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:aybudle/core/services/api_service.dart';
 
 class LoginViewModel with ChangeNotifier {
-  final String baseUrl;
+  String baseUrl;
   final ApiService _apiService = ApiService();
 
   String _username = '';
@@ -38,22 +38,23 @@ class LoginViewModel with ChangeNotifier {
   void toggleRememberMe(bool? value) async {
     _rememberMe = value ?? false;
     notifyListeners();
-    // If disabling "Remember Me", clear saved credentials
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('rememberMeEnabled', _rememberMe);
     if (!_rememberMe) {
-      final prefs = await SharedPreferences.getInstance();
+      // Clear any stored credentials if the user unchecks "Remember Me"
       await prefs.remove('rememberedUsername');
       await prefs.remove('rememberedPassword');
     }
   }
 
+  // In your login screen's initState or using a Provider in LoginViewModel:
   Future<void> _loadRememberedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedUsername = prefs.getString('rememberedUsername');
-    final savedPassword = prefs.getString('rememberedPassword');
-    if (savedUsername != null && savedPassword != null) {
-      _username = savedUsername;
-      _password = savedPassword;
-      _rememberMe = true;
+    bool rememberMe = prefs.getBool('rememberMeEnabled') ?? false;
+    if (rememberMe) {
+      _username = prefs.getString('rememberedUsername') ?? '';
+      _password = prefs.getString('rememberedPassword') ?? '';
+      baseUrl = prefs.getString('rememberedSite') ?? '';
       notifyListeners();
     }
   }
@@ -72,6 +73,8 @@ class LoginViewModel with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('rememberedUsername', _username);
       await prefs.setString('rememberedPassword', _password);
+      // Optionally, store the token if you need it.
+      await prefs.setString('userToken', _token);
     }
     return result[0];
   }

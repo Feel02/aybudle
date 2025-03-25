@@ -1,0 +1,54 @@
+{
+    "sourceFile": "lib/features/connection/view_models/login_view_model.dart",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 9,
+            "patches": [
+                {
+                    "date": 1742915641188,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1742915831754,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -76,5 +76,10 @@\n       await prefs.setString('userToken', _token);\r\n     }\r\n     return result[0];\r\n   }\r\n+\r\n+  Future<String> LoginFunction(String baseUrl, String username, String password) async {\r\n+    final List result = await _apiService.login(baseUrl, username, password);\r\n+    return result[1];\r\n+  }\r\n }\r\n"
+                },
+                {
+                    "date": 1742915892012,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -77,9 +77,9 @@\n     }\r\n     return result[0];\r\n   }\r\n \r\n-  Future<String> LoginFunction(String baseUrl, String username, String password) async {\r\n+  static Future<String> LoginFunction(String baseUrl, String username, String password) async {\r\n     final List result = await _apiService.login(baseUrl, username, password);\r\n     return result[1];\r\n   }\r\n }\r\n"
+                },
+                {
+                    "date": 1742915968263,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -77,9 +77,9 @@\n     }\r\n     return result[0];\r\n   }\r\n \r\n-  static Future<String> LoginFunction(String baseUrl, String username, String password) async {\r\n+  Future<String> LoginFunction(String baseUrl, String username, String password) async {\r\n     final List result = await _apiService.login(baseUrl, username, password);\r\n     return result[1];\r\n   }\r\n }\r\n"
+                },
+                {
+                    "date": 1742916036511,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -76,10 +76,5 @@\n       await prefs.setString('userToken', _token);\r\n     }\r\n     return result[0];\r\n   }\r\n-\r\n-  Future<String> LoginFunction(String baseUrl, String username, String password) async {\r\n-    final List result = await _apiService.login(baseUrl, username, password);\r\n-    return result[1];\r\n-  }\r\n }\r\n"
+                },
+                {
+                    "date": 1742916619939,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,16 +37,18 @@\n \r\n   void toggleRememberMe(bool? value) async {\r\n     _rememberMe = value ?? false;\r\n     notifyListeners();\r\n-    // If disabling \"Remember Me\", clear saved credentials\r\n+    final prefs = await SharedPreferences.getInstance();\r\n+    await prefs.setBool('rememberMeEnabled', _rememberMe);\r\n     if (!_rememberMe) {\r\n-      final prefs = await SharedPreferences.getInstance();\r\n+      // Clear any stored credentials if the user unchecks \"Remember Me\"\r\n       await prefs.remove('rememberedUsername');\r\n       await prefs.remove('rememberedPassword');\r\n     }\r\n   }\r\n \r\n+\r\n   Future<void> _loadRememberedCredentials() async {\r\n     final prefs = await SharedPreferences.getInstance();\r\n     final savedUsername = prefs.getString('rememberedUsername');\r\n     final savedPassword = prefs.getString('rememberedPassword');\r\n"
+                },
+                {
+                    "date": 1742916706705,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,17 +46,16 @@\n       await prefs.remove('rememberedPassword');\r\n     }\r\n   }\r\n \r\n-\r\n+  // In your login screen's initState or using a Provider in LoginViewModel:\r\n   Future<void> _loadRememberedCredentials() async {\r\n     final prefs = await SharedPreferences.getInstance();\r\n-    final savedUsername = prefs.getString('rememberedUsername');\r\n-    final savedPassword = prefs.getString('rememberedPassword');\r\n-    if (savedUsername != null && savedPassword != null) {\r\n-      _username = savedUsername;\r\n-      _password = savedPassword;\r\n-      _rememberMe = true;\r\n+    bool rememberMe = prefs.getBool('rememberMeEnabled') ?? false;\r\n+    if (rememberMe) {\r\n+      _username = prefs.getString('rememberedUsername') ?? '';\r\n+      _password = prefs.getString('rememberedPassword') ?? '';\r\n+      _url = prefs.getString('rememberedSite') ?? '';\r\n       notifyListeners();\r\n     }\r\n   }\r\n \r\n"
+                },
+                {
+                    "date": 1742916727470,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,8 +10,9 @@\n \r\n   String _username = '';\r\n   String _password = '';\r\n   String _token = '';\r\n+  String _url = '';\r\n   bool _isLoading = false;\r\n   bool _rememberMe = false;\r\n \r\n   String get username => _username;\r\n"
+                },
+                {
+                    "date": 1742916842245,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,9 +10,8 @@\n \r\n   String _username = '';\r\n   String _password = '';\r\n   String _token = '';\r\n-  String _url = '';\r\n   bool _isLoading = false;\r\n   bool _rememberMe = false;\r\n \r\n   String get username => _username;\r\n"
+                },
+                {
+                    "date": 1742916853649,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n import 'package:shared_preferences/shared_preferences.dart';\r\n import 'package:aybudle/core/services/api_service.dart';\r\n \r\n class LoginViewModel with ChangeNotifier {\r\n-  final String baseUrl;\r\n+  String baseUrl;\r\n   final ApiService _apiService = ApiService();\r\n \r\n   String _username = '';\r\n   String _password = '';\r\n@@ -53,9 +53,9 @@\n     bool rememberMe = prefs.getBool('rememberMeEnabled') ?? false;\r\n     if (rememberMe) {\r\n       _username = prefs.getString('rememberedUsername') ?? '';\r\n       _password = prefs.getString('rememberedPassword') ?? '';\r\n-      _url = prefs.getString('rememberedSite') ?? '';\r\n+      baseUrl = prefs.getString('rememberedSite') ?? '';\r\n       notifyListeners();\r\n     }\r\n   }\r\n \r\n"
+                }
+            ],
+            "date": 1742915641188,
+            "name": "Commit-0",
+            "content": "import 'dart:ffi';\r\n\r\nimport 'package:flutter/foundation.dart';\r\nimport 'package:shared_preferences/shared_preferences.dart';\r\nimport 'package:aybudle/core/services/api_service.dart';\r\n\r\nclass LoginViewModel with ChangeNotifier {\r\n  final String baseUrl;\r\n  final ApiService _apiService = ApiService();\r\n\r\n  String _username = '';\r\n  String _password = '';\r\n  String _token = '';\r\n  bool _isLoading = false;\r\n  bool _rememberMe = false;\r\n\r\n  String get username => _username;\r\n  String get password => _password;\r\n  bool get isLoading => _isLoading;\r\n  bool get rememberMe => _rememberMe;\r\n\r\n  LoginViewModel(this.baseUrl) {\r\n    _loadRememberedCredentials();\r\n  }\r\n\r\n  void setUsername(String value) {\r\n    _username = value;\r\n  }\r\n\r\n  void setPassword(String value) {\r\n    _password = value;\r\n  }\r\n\r\n  String getToken() {\r\n    return _token;\r\n  }\r\n\r\n  void toggleRememberMe(bool? value) async {\r\n    _rememberMe = value ?? false;\r\n    notifyListeners();\r\n    // If disabling \"Remember Me\", clear saved credentials\r\n    if (!_rememberMe) {\r\n      final prefs = await SharedPreferences.getInstance();\r\n      await prefs.remove('rememberedUsername');\r\n      await prefs.remove('rememberedPassword');\r\n    }\r\n  }\r\n\r\n  Future<void> _loadRememberedCredentials() async {\r\n    final prefs = await SharedPreferences.getInstance();\r\n    final savedUsername = prefs.getString('rememberedUsername');\r\n    final savedPassword = prefs.getString('rememberedPassword');\r\n    if (savedUsername != null && savedPassword != null) {\r\n      _username = savedUsername;\r\n      _password = savedPassword;\r\n      _rememberMe = true;\r\n      notifyListeners();\r\n    }\r\n  }\r\n\r\n  Future<bool> login() async {\r\n    _isLoading = true;\r\n    notifyListeners();\r\n\r\n    List result = await _apiService.login(baseUrl, _username, _password);\r\n    _token = result[1];\r\n\r\n    _isLoading = false;\r\n    notifyListeners();\r\n\r\n    if (_rememberMe && result[0]) {\r\n      final prefs = await SharedPreferences.getInstance();\r\n      await prefs.setString('rememberedUsername', _username);\r\n      await prefs.setString('rememberedPassword', _password);\r\n      // Optionally, store the token if you need it.\r\n      await prefs.setString('userToken', _token);\r\n    }\r\n    return result[0];\r\n  }\r\n}\r\n"
+        }
+    ]
+}

@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 6,
+            "activePatchIndex": 17,
             "patches": [
                 {
                     "date": 1742225256900,
@@ -32,6 +32,50 @@
                 {
                     "date": 1742227693497,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,8 +60,10 @@\n \r\n       print('--- Raw courses response ---');\r\n       print(coursesResponse.data);\r\n \r\n+      List coursesList = coursesResponse.data;\r\n+\r\n       List<Map<String, dynamic>> coursesDetails = [];\r\n \r\n       // 2. For each course, fetch course contents.\r\n       for (var course in coursesList) {\r\n"
+                },
+                {
+                    "date": 1742909672660,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -149,8 +149,17 @@\n                       title: Text(module['name'] ?? 'Unnamed Module'),\r\n                       subtitle: Text(\r\n                         'Type: ${module['modname']}, Visible: ${module['visible']}',\r\n                       ),\r\n+                      onTap: () {\r\n+                        // Navigate to the message detail screen when tapped\r\n+                        Navigator.push(\r\n+                          context,\r\n+                          MaterialPageRoute(\r\n+                            builder: (_) => MessageDetailScreen(module: module),\r\n+                          ),\r\n+                        );\r\n+                      },\r\n                     );\r\n                   }).toList(),\r\n                 ),\r\n               );\r\n"
+                },
+                {
+                    "date": 1742909740739,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,5 @@\n+import 'package:aybudle/features/connection/screens/message_detail_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:dio/dio.dart';\r\n \r\n class CoursesScreen extends StatefulWidget {\r\n"
+                },
+                {
+                    "date": 1742910222379,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -147,19 +147,28 @@\n                   subtitle: Text('Section ID: ${section['id']}'),\r\n                   children: (section['modules'] as List<dynamic>).map<Widget>((module) {\r\n                     return ListTile(\r\n                       title: Text(module['name'] ?? 'Unnamed Module'),\r\n-                      subtitle: Text(\r\n-                        'Type: ${module['modname']}, Visible: ${module['visible']}',\r\n-                      ),\r\n+                      subtitle: Text('Type: ${module['modname']}, Visible: ${module['visible']}'),\r\n                       onTap: () {\r\n-                        // Navigate to the message detail screen when tapped\r\n-                        Navigator.push(\r\n-                          context,\r\n-                          MaterialPageRoute(\r\n-                            builder: (_) => MessageDetailScreen(module: module),\r\n-                          ),\r\n-                        );\r\n+                        if (module['modname'] == 'forum') {\r\n+                          // Navigate to ForumDiscussionsScreen using the token and forum id (module['instance'])\r\n+                          Navigator.push(\r\n+                            context,\r\n+                            MaterialPageRoute(\r\n+                              builder: (_) => ForumDiscussionsScreen(\r\n+                                baseUrl: widget.baseUrl,\r\n+                                token: widget.token,\r\n+                                forumId: module['instance'],\r\n+                              ),\r\n+                            ),\r\n+                          );\r\n+                        } else {\r\n+                          // For other module types, you can add similar logic or a fallback.\r\n+                          ScaffoldMessenger.of(context).showSnackBar(\r\n+                            const SnackBar(content: Text('This module type is not supported yet.')),\r\n+                          );\r\n+                        }\r\n                       },\r\n                     );\r\n                   }).toList(),\r\n                 ),\r\n"
+                },
+                {
+                    "date": 1742910246039,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,6 @@\n import 'package:aybudle/features/connection/screens/message_detail_screen.dart';\r\n+import 'package:aybudle/features/connection/screens/forum_discussions_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:dio/dio.dart';\r\n \r\n class CoursesScreen extends StatefulWidget {\r\n"
+                },
+                {
+                    "date": 1742910366277,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,5 @@\n+import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';\r\n import 'package:aybudle/features/connection/screens/message_detail_screen.dart';\r\n import 'package:aybudle/features/connection/screens/forum_discussions_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:dio/dio.dart';\r\n"
+                },
+                {
+                    "date": 1742910373839,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,6 @@\n import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';\r\n import 'package:aybudle/features/connection/screens/message_detail_screen.dart';\r\n-import 'package:aybudle/features/connection/screens/forum_discussions_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:dio/dio.dart';\r\n \r\n class CoursesScreen extends StatefulWidget {\r\n"
+                },
+                {
+                    "date": 1742910389275,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,5 @@\n import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';\r\n-import 'package:aybudle/features/connection/screens/message_detail_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:dio/dio.dart';\r\n \r\n class CoursesScreen extends StatefulWidget {\r\n"
+                },
+                {
+                    "date": 1742915675515,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -188,18 +188,36 @@\n   Widget build(BuildContext context) {\r\n     return Scaffold(\r\n       appBar: AppBar(\r\n         title: const Text('Courses Details'),\r\n+        leading: IconButton(\r\n+          icon: const Icon(Icons.logout),\r\n+          onPressed: () async {\r\n+            final prefs = await SharedPreferences.getInstance();\r\n+            await prefs.remove('rememberedUsername');\r\n+            await prefs.remove('rememberedPassword');\r\n+            await prefs.remove('userToken');\r\n+            // Optionally remove 'rememberedSite' if needed:\r\n+            await prefs.remove('rememberedSite');\r\n+            \r\n+            // Navigate back to the ConnectionScreen (clearing the stack)\r\n+            Navigator.of(context).pushAndRemoveUntil(\r\n+              MaterialPageRoute(builder: (_) => const ConnectionScreen()),\r\n+              (route) => false,\r\n+            );\r\n+          },\r\n+        ),\r\n       ),\r\n       body: _isLoading\r\n           ? const Center(child: CircularProgressIndicator())\r\n           : _coursesDetails.isEmpty\r\n-              ? const Center(child: Text('No courses found'))\r\n+              ? const Center(child: Text(AppConstants.noCoursesText))\r\n               : ListView.builder(\r\n                   itemCount: _coursesDetails.length,\r\n                   itemBuilder: (context, index) {\r\n                     return _buildCourseTile(_coursesDetails[index]);\r\n                   },\r\n                 ),\r\n     );\r\n   }\r\n+\r\n }\r\n"
+                },
+                {
+                    "date": 1742915681943,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:dio/dio.dart';\r\n+import 'package:shared_preferences/shared_preferences.dart';\r\n \r\n class CoursesScreen extends StatefulWidget {\r\n   final String baseUrl;\r\n   final String token;\r\n"
+                },
+                {
+                    "date": 1742915694253,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+import 'package:aybudle/core/constants/app_constants.dart';\r\n+import 'package:aybudle/features/connection/screens/connection_screen.dart';\r\n import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';\r\n import 'package:flutter/material.dart';\r\n import 'package:dio/dio.dart';\r\n import 'package:shared_preferences/shared_preferences.dart';\r\n"
+                },
+                {
+                    "date": 1742916539232,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -191,19 +191,28 @@\n   Widget build(BuildContext context) {\r\n     return Scaffold(\r\n       appBar: AppBar(\r\n         title: const Text('Courses Details'),\r\n+        // In your CoursesScreen's AppBar logout button:\r\n         leading: IconButton(\r\n           icon: const Icon(Icons.logout),\r\n           onPressed: () async {\r\n             final prefs = await SharedPreferences.getInstance();\r\n-            await prefs.remove('rememberedUsername');\r\n-            await prefs.remove('rememberedPassword');\r\n-            await prefs.remove('userToken');\r\n-            // Optionally remove 'rememberedSite' if needed:\r\n-            await prefs.remove('rememberedSite');\r\n+            // Check if \"Remember Me\" is enabled.\r\n+            bool rememberMe = prefs.getBool('rememberMeEnabled') ?? false;\r\n             \r\n-            // Navigate back to the ConnectionScreen (clearing the stack)\r\n+            if (!rememberMe) {\r\n+              // Clear everything if the user did NOT choose \"Remember Me\".\r\n+              await prefs.remove('rememberedUsername');\r\n+              await prefs.remove('rememberedPassword');\r\n+              await prefs.remove('rememberedSite');\r\n+            } else {\r\n+              // If \"Remember Me\" is enabled, clear only session-related data (e.g., token)\r\n+              await prefs.remove('userToken');\r\n+              // Optionally, you can update other session flags as needed.\r\n+            }\r\n+            \r\n+            // Navigate back to ConnectionScreen (clearing the navigation stack)\r\n             Navigator.of(context).pushAndRemoveUntil(\r\n               MaterialPageRoute(builder: (_) => const ConnectionScreen()),\r\n               (route) => false,\r\n             );\r\n"
                 }
             ],
             "date": 1742225256900,

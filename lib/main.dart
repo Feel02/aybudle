@@ -1,4 +1,5 @@
 import 'package:aybudle/core/constants/app_constants.dart';
+import 'package:aybudle/features/connection/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'features/connection/screens/connection_screen.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: const ConnectionScreen(),
+        home: const SplashScreen(),
       ),
     );
   }
