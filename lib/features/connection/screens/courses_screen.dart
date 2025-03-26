@@ -1,6 +1,7 @@
 import 'package:aybudle/core/constants/app_constants.dart';
 import 'package:aybudle/features/connection/screens/connection_screen.dart';
 import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';
+import 'package:aybudle/features/connection/screens/notifications_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -192,7 +193,6 @@ class _CoursesScreenState extends State<CoursesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Courses Details'),
-        // In your CoursesScreen's AppBar logout button:
         leading: IconButton(
           icon: const Icon(Icons.logout),
           onPressed: () async {
@@ -218,6 +218,20 @@ class _CoursesScreenState extends State<CoursesScreen> {
             );
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => NotificationsScreen(
+                  baseUrl: widget.baseUrl,
+                  token: widget.token,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

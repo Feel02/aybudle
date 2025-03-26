@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 17,
+            "activePatchIndex": 18,
             "patches": [
                 {
                     "date": 1742225256900,
@@ -76,6 +76,10 @@
                 {
                     "date": 1742916539232,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -191,19 +191,28 @@\n   Widget build(BuildContext context) {\r\n     return Scaffold(\r\n       appBar: AppBar(\r\n         title: const Text('Courses Details'),\r\n+        // In your CoursesScreen's AppBar logout button:\r\n         leading: IconButton(\r\n           icon: const Icon(Icons.logout),\r\n           onPressed: () async {\r\n             final prefs = await SharedPreferences.getInstance();\r\n-            await prefs.remove('rememberedUsername');\r\n-            await prefs.remove('rememberedPassword');\r\n-            await prefs.remove('userToken');\r\n-            // Optionally remove 'rememberedSite' if needed:\r\n-            await prefs.remove('rememberedSite');\r\n+            // Check if \"Remember Me\" is enabled.\r\n+            bool rememberMe = prefs.getBool('rememberMeEnabled') ?? false;\r\n             \r\n-            // Navigate back to the ConnectionScreen (clearing the stack)\r\n+            if (!rememberMe) {\r\n+              // Clear everything if the user did NOT choose \"Remember Me\".\r\n+              await prefs.remove('rememberedUsername');\r\n+              await prefs.remove('rememberedPassword');\r\n+              await prefs.remove('rememberedSite');\r\n+            } else {\r\n+              // If \"Remember Me\" is enabled, clear only session-related data (e.g., token)\r\n+              await prefs.remove('userToken');\r\n+              // Optionally, you can update other session flags as needed.\r\n+            }\r\n+            \r\n+            // Navigate back to ConnectionScreen (clearing the navigation stack)\r\n             Navigator.of(context).pushAndRemoveUntil(\r\n               MaterialPageRoute(builder: (_) => const ConnectionScreen()),\r\n               (route) => false,\r\n             );\r\n"
+                },
+                {
+                    "date": 1742921260408,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -191,9 +191,8 @@\n   Widget build(BuildContext context) {\r\n     return Scaffold(\r\n       appBar: AppBar(\r\n         title: const Text('Courses Details'),\r\n-        // In your CoursesScreen's AppBar logout button:\r\n         leading: IconButton(\r\n           icon: const Icon(Icons.logout),\r\n           onPressed: () async {\r\n             final prefs = await SharedPreferences.getInstance();\r\n@@ -217,8 +216,22 @@\n               (route) => false,\r\n             );\r\n           },\r\n         ),\r\n+        actions: [\r\n+          IconButton(\r\n+            icon: const Icon(Icons.notifications),\r\n+            onPressed: () => Navigator.push(\r\n+              context,\r\n+              MaterialPageRoute(\r\n+                builder: (_) => NotificationsScreen(\r\n+                  baseUrl: widget.baseUrl,\r\n+                  token: widget.token,\r\n+                ),\r\n+              ),\r\n+            ),\r\n+          ),\r\n+        ],\r\n       ),\r\n       body: _isLoading\r\n           ? const Center(child: CircularProgressIndicator())\r\n           : _coursesDetails.isEmpty\r\n"
                 }
             ],
             "date": 1742225256900,
