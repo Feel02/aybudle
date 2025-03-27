@@ -1,3 +1,4 @@
+import 'package:aybudle/core/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -20,40 +21,18 @@ class DiscussionPostsScreen extends StatefulWidget {
 class _DiscussionPostsScreenState extends State<DiscussionPostsScreen> {
   bool _isLoading = true;
   Map<String, dynamic>? _discussionData;
-  final Dio _dio = Dio();
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    fetchDiscussionData();
-  }
-
-  Future<void> fetchDiscussionData() async {
-    final String serverUrl = '${widget.baseUrl}/webservice/rest/server.php';
-    try {
-      final response = await _dio.get(
-        serverUrl,
-        queryParameters: {
-          'wstoken': widget.token,
-          'wsfunction': 'mod_forum_get_forum_discussion',
-          'moodlewsrestformat': 'json',
-          'discussionid': widget.discussionId,
-        },
-      );
-
-      // Debug print the complete response
-      print('Discussion API Response: ${response.data}');
-
+    final discussion = _apiService.getDiscussions(widget.baseUrl, widget.token, widget.discussionId);
+    discussion.then((value) {
       setState(() {
-        _discussionData = response.data;
+        _discussionData = value;
         _isLoading = false;
       });
-    } catch (e) {
-      print('Error fetching discussion data: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    });
   }
 
   Widget _buildPostWidget(Map<String, dynamic> post) {

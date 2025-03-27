@@ -1,4 +1,5 @@
 import 'package:aybudle/core/constants/app_constants.dart';
+import 'package:aybudle/core/services/api_service.dart';
 import 'package:aybudle/features/connection/screens/connection_screen.dart';
 import 'package:aybudle/features/connection/screens/forum_discussion_screen.dart';
 import 'package:aybudle/features/connection/screens/notifications_screen.dart';
@@ -22,6 +23,7 @@ class CoursesScreen extends StatefulWidget {
 
 class _CoursesScreenState extends State<CoursesScreen> {
   bool _isLoading = true;
+  final ApiService _apiService = ApiService();
   // This will store a list of maps. Each map contains:
   // 'course': the course info (Map) and 'contents': the course contents (raw response)
   List<Map<String, dynamic>> _coursesDetails = [];
@@ -35,74 +37,50 @@ class _CoursesScreenState extends State<CoursesScreen> {
   }
 
   Future<void> fetchAllCoursesAndDetails() async {
-    final String serverUrl = '${widget.baseUrl}/webservice/rest/server.php';
-    print("ADNJLJSJVJSKDJVLSDJKVSDLJVSKLDJVD");
-    print(serverUrl);
     try {
-      // 1. Fetch user informations
-      final userResponse = await _dio.get(
-        serverUrl,
-        queryParameters: {
-          'wstoken': widget.token,
-          'wsfunction': 'core_webservice_get_site_info',
-          'moodlewsrestformat': 'json',
-        },
-      );
+      final String serverUrl = '${widget.baseUrl}/webservice/rest/server.php';
+      print("ADNJLJSJVJSKDJVLSDJKVSDLJVSKLDJVD");
+      print(serverUrl);
+      var userResponse = await _apiService.getUserInfo(widget.baseUrl, widget.token);
 
       print('--- Raw user response ---');
-      print(userResponse.data);
+      print(userResponse);
       
       // 2. Get the course informations with the userResponse
-      final coursesResponse = await _dio.get(
-        serverUrl,
-        queryParameters: {
-          'wstoken': widget.token,
-          'wsfunction': 'core_enrol_get_users_courses',
-          'moodlewsrestformat': 'json',
-          'userid': userResponse.data['userid'],
-        },
-      );
+      final coursesResponse = await _apiService.getCourses(widget.baseUrl, widget.token, userResponse['userid']);
 
       print('--- Raw courses response ---');
-      print(coursesResponse.data);
+      print(coursesResponse);
 
-      List coursesList = coursesResponse.data;
+      List coursesList = coursesResponse;
 
       List<Map<String, dynamic>> coursesDetails = [];
 
       // 2. For each course, fetch course contents.
       for (var course in coursesList) {
         final courseId = course['id'];
-        final contentsResponse = await _dio.get(
-          serverUrl,
-          queryParameters: {
-            'wstoken': widget.token,
-            'wsfunction': 'core_course_get_contents',
-            'moodlewsrestformat': 'json',
-            'courseid': courseId,
-          },
-        );
+        final contentsResponse = await _apiService.getCoursesContent(widget.baseUrl, widget.token, courseId);
 
         print('--- Raw contents response for course id $courseId ---');
-        print(contentsResponse.data);
+        print(contentsResponse);
 
         // Check if contentsResponse.data is a List. If not, log it.
-        if (contentsResponse.data is List) {
+        if (contentsResponse is List) {
           coursesDetails.add({
             'course': course,
-            'contents': contentsResponse.data,
+            'contents': contentsResponse,
           });
-        } else if (contentsResponse.data is Map<String, dynamic>) {
+        } else if (contentsResponse is Map<String, dynamic>) {
           // This might be an error response for the course.
           print('Error or unexpected structure for course id $courseId:');
-          print(contentsResponse.data);
+          print(contentsResponse);
           coursesDetails.add({
             'course': course,
             'contents': null,
-            'error': contentsResponse.data,
+            'error': contentsResponse,
           });
         } else {
-          print('Unexpected contents type for course id $courseId: ${contentsResponse.data.runtimeType}');
+          print('Unexpected contents type for course id $courseId: ${contentsResponse.runtimeType}');
           coursesDetails.add({
             'course': course,
             'contents': null,
