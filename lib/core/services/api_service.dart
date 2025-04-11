@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'dart:developer' as developer; // Use aliased developer log
 
+import 'package:aybudle/core/constants/app_constants.dart'; // Import constants for error messages
+
 class ApiService {
   final Dio _dio = Dio();
   // Let's assume we want mocking only in debug mode
@@ -16,7 +18,6 @@ class ApiService {
     ));
 
     // --- Mock Interceptor (Use carefully for debugging) ---
-    // make sure the wsfunction matches the one in getNotifications.
     /*
     if (kDebugMode) {
       _dio.interceptors.add(InterceptorsWrapper(
@@ -89,25 +90,81 @@ class ApiService {
 
   Future<bool> validateMoodleUrl(String url) async {
     try {
-      final response = await _dio.get(url);
+      // Add a timeout to prevent hanging indefinitely
+      final response = await _dio.get(url, options: Options(receiveTimeout: const Duration(seconds: 10)));
+      // Check for common Moodle page elements if status code isn't enough
+      // For now, just checking status code
       return response.statusCode == 200;
     } catch (e) {
+      developer.log('URL validation failed for $url: $e', name: 'ApiService');
       return false;
     }
   }
 
-  Future<List> login(String baseUrl, String username, String password) async {
+  /// Logs in the user and returns a list: [bool success, String? tokenOrError].
+  /// Uses queryParameters for consistency.
+  Future<List<dynamic>> login(String baseUrl, String username, String password) async {
+    final String loginUrl = "$baseUrl/login/token.php"; // Base URL path for the token endpoint
     try {
+      developer.log('Attempting login to: $loginUrl with username: $username', name: 'ApiService');
       final response = await _dio.get(
-        "$baseUrl/login/token.php?username=$username&password=$password&service=moodle_mobile_app",
+        loginUrl, // Use the base URL path here
+        queryParameters: { // Pass parameters in the map
+          'username': username,
+          'password': password,
+          'service': 'moodle_mobile_app', // Keep the required service parameter
+        },
+        options: Options(
+          // Set a reasonable timeout for login requests
+          receiveTimeout: const Duration(seconds: 15),
+          // headers: {'Accept': 'application/json'}, // Usually not needed for GET token
+        ),
       );
-      if (response.statusCode == 200 && response.data["token"] != null) {
-        print(response.data);
-        return [true, response.data["token"]];
+
+      // Check response status and data structure
+      if (response.statusCode == 200 && response.data is Map) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData.containsKey('token') && responseData['token'] != null) {
+          developer.log('Login successful, token received.', name: 'ApiService');
+          return [true, responseData['token']];
+        } else if (responseData.containsKey('error')) {
+          // Moodle often returns a 200 OK with an error message in the body for bad credentials
+          String errorMsg = responseData['error'] ?? AppConstants.invalidCredentialsText;
+          developer.log('Login failed (API Error): $errorMsg | Error Code: ${responseData['errorcode']}', name: 'ApiService', level: 900);
+          return [false, errorMsg]; // Return the specific error message
+        } else {
+          // Successful status code but unexpected data format
+           developer.log('Login failed: Status 200 but token missing and no error key found. Response: $responseData', name: 'ApiService', level: 900);
+           return [false, AppConstants.loginFailedText]; // Generic failure
+        }
+      } else {
+        // Handle non-200 status codes
+        developer.log('Login failed: Status code ${response.statusCode}. Response: ${response.data}', name: 'ApiService', level: 900);
+        return [false, '${AppConstants.loginFailedText} (Status: ${response.statusCode})'];
       }
-      return [false,null];
-    } catch (e) {
-      return [false,null];
+    } on DioException catch (e) { // Catch Dio specific errors
+        developer.log('Login DioError: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace, level: 1000);
+        developer.log('DioError Response: ${e.response?.data}', name: 'ApiService', level: 1000);
+
+        String errorMessage = AppConstants.loginFailedText; // Default error
+        // Try to extract Moodle error from Dio error response if available
+        if (e.response?.data is Map && e.response!.data.containsKey('error')) {
+            errorMessage = e.response!.data['error'] ?? errorMessage;
+        } else if (e.type == DioExceptionType.connectionTimeout ||
+                   e.type == DioExceptionType.sendTimeout ||
+                   e.type == DioExceptionType.receiveTimeout) {
+            errorMessage = 'Connection timed out. Please try again.';
+        } else if (e.type == DioExceptionType.unknown || e.type == DioExceptionType.connectionError) {
+            // This often covers DNS resolution issues, network unreachable, etc.
+            errorMessage = 'Network error. Please check your connection and the site URL.';
+        } else if (e.response != null) {
+            // Other HTTP errors (404, 500 etc.)
+             errorMessage = '${AppConstants.loginFailedText} (Server Error: ${e.response?.statusCode})';
+        }
+        return [false, errorMessage]; // Return the determined error message
+    } catch (e, s) { // Catch any other unexpected errors
+      developer.log('Login unexpected error: $e', name: 'ApiService', error: e, stackTrace: s, level: 1000);
+      return [false, 'An unexpected error occurred during login.'];
     }
   }
 
@@ -123,14 +180,34 @@ class ApiService {
         },
       );
        if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
-         return response.data;
+         // Check for Moodle API error within the response data
+         final responseData = response.data as Map<String, dynamic>;
+         if (responseData.containsKey('exception')) {
+           developer.log('Moodle API Error getting user info: ${responseData['message']} (${responseData['errorcode']})', name: 'ApiService', level: 1000);
+           throw Exception('API Error: ${responseData['message']} (${responseData['errorcode']})');
+         }
+         return responseData;
        } else {
+         developer.log('Failed to get user info: Status code ${response.statusCode}, Data type: ${response.data?.runtimeType}', name: 'ApiService');
          throw Exception('Failed to get user info: Invalid response format or status code ${response.statusCode}');
        }
-    } catch (e) {
-      developer.log('Failed to get user info', name: 'ApiService', error: e);
+    } on DioException catch (e) {
+        developer.log('DioError getting user info: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace);
+        developer.log('DioError Response: ${e.response?.data}', name: 'ApiService');
+        String errorMsg = 'Network error getting user info.';
+        if (e.response?.data is Map && e.response!.data.containsKey('message')) {
+          errorMsg = 'API Error: ${e.response!.data['message']}';
+        } else if (e.message != null) {
+           errorMsg = 'Network error: ${e.message}';
+        }
+        throw Exception(errorMsg);
+    } catch (e, s) {
+      developer.log('Failed to get user info: $e', name: 'ApiService', error: e, stackTrace: s);
       // Re-throw a more specific exception or handle it as needed
-      throw Exception('Failed to get user info: $e');
+      if (e is Exception && e.toString().contains('API Error:')) {
+         throw e; // Re-throw Moodle API errors we caught earlier
+      }
+      throw Exception('An unexpected error occurred while getting user info: ${e.toString()}');
     }
   }
 
@@ -146,14 +223,37 @@ class ApiService {
             'userid': userId,
           },
         );
-        if (response.statusCode == 200 && response.data is List) {
-            return response.data;
+        if (response.statusCode == 200) {
+            // Moodle might return an error object instead of a list if permissions are wrong etc.
+            if (response.data is List) {
+                return response.data;
+            } else if (response.data is Map && response.data.containsKey('exception')) {
+                developer.log('API Error getting courses: ${response.data['message']} (${response.data['errorcode']})', name: 'ApiService', level: 1000);
+                throw Exception('API Error: ${response.data['message']} (${response.data['errorcode']})');
+            } else {
+                // Unexpected format even with 200 status
+                developer.log('Failed to get courses: Expected List but got ${response.data.runtimeType}', name: 'ApiService');
+                throw Exception('Failed to get courses: Unexpected response format');
+            }
         } else {
-             throw Exception('Failed to get courses: Invalid response format or status code ${response.statusCode}');
+             developer.log('Failed to get courses: Status code ${response.statusCode}, Data: ${response.data}', name: 'ApiService');
+             throw Exception('Failed to get courses: Invalid status code ${response.statusCode}');
         }
-      } catch (e) {
-        developer.log('Failed to get courses', name: 'ApiService', error: e);
-        throw Exception('Failed to get courses: $e');
+      } on DioException catch (e) {
+          developer.log('DioError getting courses: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace);
+          String errorMsg = 'Network error getting courses.';
+          if (e.response?.data is Map && e.response!.data.containsKey('message')) {
+             errorMsg = 'API Error: ${e.response!.data['message']}';
+          } else if (e.message != null) {
+             errorMsg = 'Network error: ${e.message}';
+          }
+          throw Exception(errorMsg);
+      } catch (e, s) {
+        developer.log('Failed to get courses: $e', name: 'ApiService', error: e, stackTrace: s);
+        if (e is Exception && e.toString().contains('API Error:')) {
+            throw e;
+        }
+        throw Exception('An unexpected error occurred while getting courses: ${e.toString()}');
       }
   }
 
@@ -169,20 +269,42 @@ class ApiService {
             'courseid': courseId,
           },
         );
-         if (response.statusCode == 200 && response.data is List) {
-            return response.data;
-        } else {
-            // Moodle might return an error object instead of a list
-             if (response.data is Map && response.data.containsKey('exception')) {
-                 developer.log('API Error getting content for course $courseId: ${response.data}', name: 'ApiService');
-                 // Return an empty list or throw a specific error
-                 return []; // Or throw Exception('API Error: ${response.data['message']}');
+         if (response.statusCode == 200) {
+             if (response.data is List) {
+                return response.data;
+             } else if (response.data is Map && response.data.containsKey('exception')) {
+                 developer.log('API Error getting content for course $courseId: ${response.data['message']} (${response.data['errorcode']})', name: 'ApiService', level: 900); // Warning level maybe
+                 // Decide whether to throw or return empty. Returning empty might be better UX.
+                 // throw Exception('API Error: ${response.data['message']} (${response.data['errorcode']})');
+                 return []; // Return empty list on specific content error
+             } else {
+                 developer.log('Failed to get course content for $courseId: Expected List but got ${response.data.runtimeType}', name: 'ApiService');
+                 throw Exception('Failed to get course content for $courseId: Unexpected response format');
              }
-             throw Exception('Failed to get course content for $courseId: Invalid response format or status code ${response.statusCode}');
+        } else {
+            developer.log('Failed to get course content for $courseId: Status code ${response.statusCode}, Data: ${response.data}', name: 'ApiService');
+             throw Exception('Failed to get course content for $courseId: Invalid status code ${response.statusCode}');
         }
-    } catch (e) {
-        developer.log('Failed to get course content for $courseId', name: 'ApiService', error: e);
-        throw Exception('Failed to get course content for $courseId: $e');
+    } on DioException catch (e) {
+        developer.log('DioError getting course content for $courseId: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace);
+        String errorMsg = 'Network error getting course content for $courseId.';
+        if (e.response?.data is Map && e.response!.data.containsKey('message')) {
+          errorMsg = 'API Error: ${e.response!.data['message']}';
+        } else if (e.message != null) {
+          errorMsg = 'Network error: ${e.message}';
+        }
+        // Depending on UX, might want to return [] instead of throwing
+        // return [];
+        throw Exception(errorMsg);
+    } catch (e, s) {
+        developer.log('Failed to get course content for $courseId: $e', name: 'ApiService', error: e, stackTrace: s);
+        if (e is Exception && e.toString().contains('API Error:')) {
+            // Maybe return [] here too?
+             return [];
+            // throw e;
+        }
+        // return [];
+        throw Exception('An unexpected error occurred while getting content for course $courseId: ${e.toString()}');
     }
   }
 
@@ -261,64 +383,138 @@ class ApiService {
       );
 
       if (response.statusCode == 200 && response.data is Map) {
-         // Check for a success indicator or absence of error in the response
+         final responseData = response.data as Map<String, dynamic>;
+         // Check for Moodle API error within the response data
+         if (responseData.containsKey('exception')) {
+             developer.log('Moodle API Error marking notification read: ${responseData['message']} (${responseData['errorcode']})', name: 'ApiService', level: 1000);
+             // Optionally throw Exception('API Error: ${responseData['message']}');
+             return false; // Treat API error as failure
+         }
+         // Check for a success indicator or absence of error/warning in the response
          // Moodle APIs often return a status or warning array. An empty warning array usually means success.
-         if (response.data['warnings'] == null || (response.data['warnings'] as List).isEmpty) {
+         final warnings = responseData['warnings'] as List<dynamic>?;
+         if (warnings == null || warnings.isEmpty) {
             developer.log('Successfully marked notification $notificationId as read.', name: 'ApiService');
             return true;
          } else {
-            developer.log('API Warnings marking notification read: ${response.data['warnings']}', name: 'ApiService');
+            developer.log('API Warnings marking notification read: $warnings', name: 'ApiService', level: 900);
             // Decide if warnings should count as failure
-            return false; // Or true depending on severity
+            return true; // Treat warnings as non-fatal for now
          }
       } else {
-         developer.log('Failed to mark notification read: Status code ${response.statusCode}, Data: ${response.data}', name: 'ApiService');
+         developer.log('Failed to mark notification read: Status code ${response.statusCode}, Data: ${response.data}', name: 'ApiService', level: 900);
          return false;
       }
-    } catch (e) {
-      developer.log('Error marking notification read: $e', name: 'ApiService', error: e);
+    } on DioException catch (e) {
+       developer.log('DioError marking notification read: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace);
+       // Handle specific Dio errors if needed
+       return false;
+    } catch (e, s) {
+      developer.log('Error marking notification read: $e', name: 'ApiService', error: e, stackTrace: s, level: 1000);
       return false;
     }
   }
 
   Future<Map<String, dynamic>> getDiscussions(String baseUrl, String token, int discussionId) async {
     final String serverUrl = '$baseUrl/webservice/rest/server.php';
+    developer.log('Fetching discussion details for ID: $discussionId', name: 'ApiService');
     try {
       final response = await _dio.get(
         serverUrl,
         queryParameters: {
           'wstoken': token,
-          'wsfunction': 'mod_forum_get_forum_discussion',
+          'wsfunction': 'mod_forum_get_forum_discussion_posts', // Updated function based on common Moodle API names - check your Moodle version!
+          // 'wsfunction': 'mod_forum_get_discussion_posts', // Another possibility
           'moodlewsrestformat': 'json',
           'discussionid': discussionId,
+          // Optional parameters:
+          // 'sortby': 'created', // Default
+          // 'sortdirection': 'ASC', // Default
         },
       );
 
-      return response.data;
-    } catch (e) {
-      print('Error fetching discussion data: $e');
-      return {};
+      if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+         final responseData = response.data as Map<String, dynamic>;
+         if (responseData.containsKey('exception')) {
+           developer.log('Moodle API Error getting discussion $discussionId: ${responseData['message']} (${responseData['errorcode']})', name: 'ApiService', level: 1000);
+           throw Exception('API Error: ${responseData['message']} (${responseData['errorcode']})');
+         }
+         developer.log('Successfully fetched discussion $discussionId.', name: 'ApiService');
+         return responseData; // Should contain 'posts' list, 'ratinginfo', etc.
+       } else {
+         developer.log('Failed to get discussion $discussionId: Status code ${response.statusCode}, Data type: ${response.data?.runtimeType}', name: 'ApiService');
+         throw Exception('Failed to get discussion $discussionId: Invalid response format or status code ${response.statusCode}');
+       }
+    } on DioException catch (e) {
+        developer.log('DioError getting discussion $discussionId: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace);
+        String errorMsg = 'Network error getting discussion $discussionId.';
+        if (e.response?.data is Map && e.response!.data.containsKey('message')) {
+          errorMsg = 'API Error: ${e.response!.data['message']}';
+        }
+        throw Exception(errorMsg);
+    } catch (e, s) {
+      developer.log('Error fetching discussion data for $discussionId: $e', name: 'ApiService', error: e, stackTrace: s, level: 1000);
+       if (e is Exception && e.toString().contains('API Error:')) {
+            throw e;
+       }
+      throw Exception('An unexpected error occurred while fetching discussion $discussionId: ${e.toString()}');
     }
   }
 
   Future<List> getForumDiscussionsForum(String baseUrl, String token, int forumId) async {
     final String serverUrl = '$baseUrl/webservice/rest/server.php';
+     developer.log('Fetching discussions for forum ID: $forumId', name: 'ApiService');
     try {
       final response = await _dio.get(
         serverUrl,
         queryParameters: {
           'wstoken': token,
-          'wsfunction': 'mod_forum_get_forum_discussions',
+          'wsfunction': 'mod_forum_get_forum_discussions', // Correct function name seems to be used
           'moodlewsrestformat': 'json',
           'forumid': forumId,
+           // Optional parameters:
+           // 'sortorder': -1, // Sort by time modified DESC (default)
+           // 'page': 0, // Page number
+           // 'perpage': 0, // All discussions (default)
+           // 'groupid': 0, // Specific group
         },
       );
-     
-      return response.data['discussions'];
-    } catch (e) {
-      print('Error fetching discussions: $e');
-      return [];
+
+     if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+         if (responseData.containsKey('exception')) {
+           developer.log('Moodle API Error getting forum $forumId discussions: ${responseData['message']} (${responseData['errorcode']})', name: 'ApiService', level: 1000);
+           throw Exception('API Error: ${responseData['message']} (${responseData['errorcode']})');
+         }
+         // Expecting a map containing a 'discussions' list
+         if (responseData.containsKey('discussions') && responseData['discussions'] is List) {
+             developer.log('Successfully fetched ${responseData['discussions'].length} discussions for forum $forumId.', name: 'ApiService');
+             return responseData['discussions'] as List;
+         } else {
+             developer.log('Failed to get discussions for forum $forumId: "discussions" key missing or not a list. Response: $responseData', name: 'ApiService');
+             throw Exception('Failed to get discussions for forum $forumId: Unexpected response structure.');
+         }
+     } else {
+         developer.log('Failed to get discussions for forum $forumId: Status code ${response.statusCode}, Data type: ${response.data?.runtimeType}', name: 'ApiService');
+         throw Exception('Failed to get discussions for forum $forumId: Invalid response format or status code ${response.statusCode}');
+     }
+    } on DioException catch (e) {
+        developer.log('DioError getting discussions for forum $forumId: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace);
+        String errorMsg = 'Network error getting discussions for forum $forumId.';
+        if (e.response?.data is Map && e.response!.data.containsKey('message')) {
+          errorMsg = 'API Error: ${e.response!.data['message']}';
+        }
+        // Decide: throw or return []? Returning empty might be better UX.
+        // throw Exception(errorMsg);
+        return [];
+    } catch (e, s) {
+      developer.log('Error fetching discussions for forum $forumId: $e', name: 'ApiService', error: e, stackTrace: s, level: 1000);
+       if (e is Exception && e.toString().contains('API Error:')) {
+            // throw e;
+            return []; // Return empty on API error too
+       }
+       // return []; // Return empty on other errors
+       throw Exception('An unexpected error occurred while fetching discussions for forum $forumId: ${e.toString()}');
     }
   }
 }
-
