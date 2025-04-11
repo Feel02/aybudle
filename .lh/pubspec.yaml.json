@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1742123406616,
@@ -24,6 +24,10 @@
                 {
                     "date": 1742921294289,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -36,8 +36,9 @@\n   dio: ^5.3.2\r\n   flutter_secure_storage: ^8.0.0\r\n   flutter_dotenv: ^5.1.0\r\n   shared_preferences: ^2.0.15\r\n+  flutter_html: ^3.0.0-alpha.6\r\n \r\n   # The following adds the Cupertino Icons font to your application.\r\n   # Use with the CupertinoIcons class for iOS style icons.\r\n   cupertino_icons: ^1.0.8\r\n"
+                },
+                {
+                    "date": 1744385391938,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -29,16 +29,16 @@\n # versions available, run `flutter pub outdated`.\r\n dependencies:\r\n   flutter:\r\n     sdk: flutter\r\n-  provider: ^6.1.1\r\n-  webview_flutter: ^4.4.0\r\n-  url_launcher: ^6.1.11\r\n-  dio: ^5.3.2\r\n   flutter_secure_storage: ^8.0.0\r\n   flutter_dotenv: ^5.1.0\r\n-  shared_preferences: ^2.0.15\r\n   flutter_html: ^3.0.0-alpha.6\r\n+  dio: ^5.4.1 # Or latest\r\n+  provider: ^6.1.2 # Or latest\r\n+  shared_preferences: ^2.2.2 # Or latest\r\n+  webview_flutter: ^4.7.0 # Or latest\r\n+  url_launcher: ^6.2.5 # Or latest\r\n \r\n   # The following adds the Cupertino Icons font to your application.\r\n   # Use with the CupertinoIcons class for iOS style icons.\r\n   cupertino_icons: ^1.0.8\r\n"
                 }
             ],
             "date": 1742123406616,
