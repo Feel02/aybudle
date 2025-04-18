@@ -16,4 +16,7 @@ class AppConstants {
   static const String noCoursesText = 'No courses found';
   static const String noContentsText = 'No contents available.';
   static const String invalidCredentialsText = 'Invalid username or password';
+  static const String filterAll = 'All';
+  static const String filterRead = 'Read';
+  static const String filterUnread = 'Unread';
 }

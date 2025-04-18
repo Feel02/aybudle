@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 11,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1742123677166,
@@ -52,6 +52,10 @@
                 {
                     "date": 1742225071565,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,8 +4,10 @@\n   static const String connectButtonText = 'Connect';\r\n   static const String urlHintText = 'Enter Moodle site URL';\r\n   static const String loginButtonText = 'Login';\r\n   static const String loginText = 'Login';\r\n+  static const String usernameText = 'Username';\r\n+  static const String passwordText = 'Password';\r\n   static const String coursesScreenTitle = 'Courses';\r\n   static const String rememberMeText = 'Remember Me';\r\n   static const String rememberSiteText = 'Remember Site';\r\n   static const String loginFailedText = 'Login Failed';\r\n"
+                },
+                {
+                    "date": 1744994050542,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,5 +15,8 @@\n   static const String logoutText = 'Logout';\r\n   static const String noCoursesText = 'No courses found';\r\n   static const String noContentsText = 'No contents available.';\r\n   static const String invalidCredentialsText = 'Invalid username or password';\r\n+  static const String filterAll = 'All';\r\n+  static const String filterRead = 'Read';\r\n+  static const String filterUnread = 'Unread';\r\n }\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1742123677166,

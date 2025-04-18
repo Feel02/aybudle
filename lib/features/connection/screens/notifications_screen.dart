@@ -1,9 +1,16 @@
+import 'package:aybudle/core/constants/app_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:aybudle/core/services/api_service.dart';
 import 'dart:developer' as developer;
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+enum NotificationFilter {
+  all,
+  read,
+  unread,
+}
 
 class NotificationsScreen extends StatefulWidget {
   final String baseUrl;
@@ -27,11 +34,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String? _error; // Store potential error messages
   final ApiService _apiService = ApiService();
   int? _userId; // Store user ID after fetching
+  NotificationFilter _selectedFilter = NotificationFilter.all;
+  List<Map<String, dynamic>> _filteredNotifications = [];
 
   @override
   void initState() {
     super.initState();
     _fetchInitialData();
+    _applyFilter(); // Initial filter application
   }
 
   Future<void> _fetchInitialData() async {
@@ -65,56 +75,48 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  void _applyFilter() {
+      setState(() {
+        switch (_selectedFilter) {
+          case NotificationFilter.all:
+            _filteredNotifications = _notifications;
+            break;
+          case NotificationFilter.read:
+            _filteredNotifications = _notifications
+                .where((n) => n['timeread'] != null)
+                .toList();
+            break;
+          case NotificationFilter.unread:
+            _filteredNotifications = _notifications
+                .where((n) => n['timeread'] == null)
+                .toList();
+            break;
+        }
+      });
+    }
+
 
   Future<void> _fetchNotifications() async {
-    if (_userId == null) {
-       developer.log('Cannot fetch notifications: User ID is null.', name: 'NotificationsScreen', level: 1000);
-       setState(() {
-         _isLoading = false;
-         _error = 'User ID not available.';
-       });
-       return;
-    }
+    if (_userId == null) return;
 
     setState(() {
       _isLoading = true;
-      _error = null; // Clear previous errors
+      _error = null;
     });
 
     try {
-      developer.log('=== Starting notifications fetch ===', name: 'NotificationsScreen');
-      developer.log('Base URL: ${widget.baseUrl}', name: 'NotificationsScreen');
-      // Avoid logging token in production
-      // developer.log('Token: ${widget.token}', name: 'NotificationsScreen');
-      developer.log('User ID: $_userId', name: 'NotificationsScreen');
-
-      // Get notifications response (expecting a Map)
-      final notificationsResponse = await _apiService.getNotifications(widget.baseUrl, widget.token, _userId!);
-      developer.log('Raw notifications response map:', name: 'NotificationsScreen');
-      developer.log(notificationsResponse.toString(), name: 'NotificationsScreen');
-
-      // Extract the list and unread count
-      final List<dynamic> notificationsList = notificationsResponse['notifications'] as List<dynamic>? ?? [];
+      final notificationsResponse = await _apiService.getNotifications(
+          widget.baseUrl, widget.token, _userId!);
+      final List<dynamic> notificationsList =
+          notificationsResponse['notifications'] as List<dynamic>? ?? [];
       final int unreadCount = notificationsResponse['unreadcount'] as int? ?? 0;
 
-       // Ensure all items in the list are Maps
-      final List<Map<String, dynamic>> typedNotifications = notificationsList
-          .whereType<Map<String, dynamic>>() // Filter out non-map items if any
-          .toList();
-
       setState(() {
-        _notifications = typedNotifications;
-        _unreadCount = unreadCount; // Update unread count
+        _notifications = notificationsList.whereType<Map<String, dynamic>>().toList();
+        _unreadCount = unreadCount;
         _isLoading = false;
+        _applyFilter(); // Apply filter after new data loads
       });
-
-      developer.log('\n=== Processed notifications data ===', name: 'NotificationsScreen');
-      developer.log('Number of notifications: ${_notifications.length}', name: 'NotificationsScreen');
-      developer.log('Reported unread count: $_unreadCount', name: 'NotificationsScreen');
-      if (_notifications.isNotEmpty) {
-        developer.log('First notification details:', name: 'NotificationsScreen');
-        developer.log(_notifications.first.toString(), name: 'NotificationsScreen');
-      }
     } catch (e, s) {
       developer.log('\n=== Error occurred fetching notifications ===', name: 'NotificationsScreen', error: e, stackTrace: s, level: 1000);
       if (e is DioException) {
@@ -131,42 +133,35 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   // Function to mark a notification as read
   Future<void> _markAsRead(int notificationId, int index) async {
-    // Optimistically update the UI first
+    // Optimistic UI update
     setState(() {
-      // Find the notification and update its timeread locally
-      // Create a mutable copy if needed
-      // Note: This assumes 'timeread' is the field indicating read status. Adjust if needed.
-       var updatedNotification = Map<String, dynamic>.from(_notifications[index]);
-       if (updatedNotification['timeread'] == null) {
-          updatedNotification['timeread'] = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-          _notifications[index] = updatedNotification;
-          _unreadCount = (_unreadCount - 1).clamp(0, _notifications.length); // Decrement unread count
-       }
+      var updatedNotification = Map<String, dynamic>.from(_notifications[index]);
+      updatedNotification['timeread'] = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      _notifications[index] = updatedNotification;
+      _unreadCount = (_unreadCount - 1).clamp(0, _notifications.length);
+      _applyFilter();
     });
 
-    // Call the API to mark as read
-    bool success = await _apiService.markNotificationRead(widget.baseUrl, widget.token, notificationId);
+    bool success = await _apiService.markNotificationRead(
+      widget.baseUrl,
+      widget.token,
+      notificationId,
+    );
 
     if (!success) {
-      developer.log('Failed to mark notification $notificationId as read on server.', name: 'NotificationsScreen', level: 900); // Log as warning
-      // Optionally revert the UI change or show a snackbar
-       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not mark notification as read on server.')),
-       );
-       // Revert UI change (optional, might cause flicker)
-       /* setState(() {
-          var revertedNotification = Map<String, dynamic>.from(_notifications[index]);
-           if (revertedNotification['timeread'] != null) { // Check if it was actually changed
-              revertedNotification['timeread'] = null;
-              _notifications[index] = revertedNotification;
-              _unreadCount++; // Increment back
-           }
-       }); */
-       // Or just refresh the list entirely to get the true state
-       // await _fetchNotifications();
+      // If failed, revert UI and show error
+      setState(() {
+        var revertedNotification = Map<String, dynamic>.from(_notifications[index]);
+        revertedNotification['timeread'] = null;
+        _notifications[index] = revertedNotification;
+        _unreadCount = (_unreadCount + 1).clamp(0, _notifications.length);
+        _applyFilter();
+      });
+      
+      await _fetchNotifications();
     } else {
-       developer.log('Successfully marked notification $notificationId as read on server.', name: 'NotificationsScreen');
-       // UI is already updated, maybe refresh the count from API if needed
+      // Force refresh from server to confirm
+      await _fetchNotifications();
     }
   }
 
@@ -291,17 +286,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-         title: Text('Notifications ($_unreadCount unread)'),
-         actions: [
-             // Add a refresh button
-             IconButton(
-                 icon: const Icon(Icons.refresh),
-                 tooltip: 'Refresh Notifications',
-                 onPressed: _isLoading ? null : _fetchNotifications, // Disable while loading
-             ),
-         ],
-      ),
+      appBar: _buildAppBar(),
       body: _buildBody(),
     );
   }
@@ -312,27 +297,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
 
     if (_error != null) {
-      return Center(
-         child: Padding(
-           padding: const EdgeInsets.all(16.0),
-           child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                 const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                 const SizedBox(height: 16),
-                 Text('Error loading notifications:', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
-                 const SizedBox(height: 8),
-                 Text(_error!, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[700])),
-                 const SizedBox(height: 20),
-                 ElevatedButton.icon(
-                   icon: const Icon(Icons.refresh),
-                   label: const Text('Retry'),
-                   onPressed: _fetchInitialData, // Retry fetching everything including user ID if needed
-                 )
-              ],
-           ),
-         ),
-      );
+      return RefreshIndicator(
+      onRefresh: _fetchNotifications,
+      child: ListView.separated(
+        itemCount: _filteredNotifications.length,
+        separatorBuilder: (context, index) => const Divider(height: 1, indent: 72),
+        itemBuilder: (context, index) =>
+            _buildNotificationItem(_filteredNotifications[index], index),
+      ),
+    );
     }
 
     if (_notifications.isEmpty) {
@@ -363,6 +336,49 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         itemBuilder: (context, index) =>
             _buildNotificationItem(_notifications[index], index),
       ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Text('Notifications ($_unreadCount unread)'),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: DropdownButton<NotificationFilter>(
+            value: _selectedFilter,
+            icon: const Icon(Icons.filter_list),
+            underline: Container(),
+            onChanged: (NotificationFilter? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  _selectedFilter = newValue;
+                  _applyFilter();
+                });
+              }
+            },
+            items: const [
+              DropdownMenuItem(
+                value: NotificationFilter.all,
+                child: Text(AppConstants.filterAll),
+              ),
+              DropdownMenuItem(
+                value: NotificationFilter.unread,
+                child: Text(AppConstants.filterUnread),
+              ),
+              DropdownMenuItem(
+                value: NotificationFilter.read,
+                child: Text(AppConstants.filterRead),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          tooltip: 'Refresh Notifications',
+          onPressed: _isLoading ? null : _fetchNotifications,
+        ),
+      ],
     );
   }
 }

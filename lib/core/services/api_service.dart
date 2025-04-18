@@ -339,8 +339,8 @@ class ApiService {
         developer.log('Successfully fetched notifications data.', name: 'ApiService');
         return responseData;
       } else {
-         developer.log('Failed to get notifications: Status code ${response.statusCode}, Data type: ${response.data.runtimeType}', name: 'ApiService');
-         throw Exception('Failed to get notifications: Invalid response format or status code ${response.statusCode}');
+        developer.log('Failed to get notifications: Status code ${response.statusCode}, Data type: ${response.data.runtimeType}', name: 'ApiService');
+        throw Exception('Failed to get notifications: Invalid response format or status code ${response.statusCode}');
       }
 
     } on DioException catch (e) {
@@ -365,52 +365,38 @@ class ApiService {
     }
   }
 
-   // --- Add function to mark notification as read ---
+  // --- Add function to mark notification as read ---
   Future<bool> markNotificationRead(String baseUrl, String token, int notificationId) async {
     developer.log('Marking notification $notificationId as read', name: 'ApiService');
     try {
-      final response = await _dio.post( // Use POST as we are changing state
+      final response = await _dio.post(
         "$baseUrl/webservice/rest/server.php",
-        queryParameters: { // Common parameters go in query
+        queryParameters: {
           'wstoken': token,
           'wsfunction': 'core_message_mark_notification_read',
           'moodlewsrestformat': 'json',
+          'notificationid': notificationId, // Move notificationid to query parameters
         },
-        data: { // Specific parameters for the function often go in data for POST
-           'notificationid': notificationId,
-           'timeread': DateTime.now().millisecondsSinceEpoch ~/ 1000, // Current time as read time
-        }
       );
 
-      if (response.statusCode == 200 && response.data is Map) {
-         final responseData = response.data as Map<String, dynamic>;
-         // Check for Moodle API error within the response data
-         if (responseData.containsKey('exception')) {
-             developer.log('Moodle API Error marking notification read: ${responseData['message']} (${responseData['errorcode']})', name: 'ApiService', level: 1000);
-             // Optionally throw Exception('API Error: ${responseData['message']}');
-             return false; // Treat API error as failure
-         }
-         // Check for a success indicator or absence of error/warning in the response
-         // Moodle APIs often return a status or warning array. An empty warning array usually means success.
-         final warnings = responseData['warnings'] as List<dynamic>?;
-         if (warnings == null || warnings.isEmpty) {
-            developer.log('Successfully marked notification $notificationId as read.', name: 'ApiService');
-            return true;
-         } else {
-            developer.log('API Warnings marking notification read: $warnings', name: 'ApiService', level: 900);
-            // Decide if warnings should count as failure
-            return true; // Treat warnings as non-fatal for now
-         }
+      if (response.statusCode == 200) {
+        // Successful response should be empty array for this API
+        if (response.data is List && (response.data as List).isEmpty) {
+          developer.log('Successfully marked notification $notificationId as read.', name: 'ApiService');
+          return true;
+        }
+        // Handle unexpected response format
+        developer.log('Unexpected response format: ${response.data}', name: 'ApiService');
+        return false;
       } else {
-         developer.log('Failed to mark notification read: Status code ${response.statusCode}, Data: ${response.data}', name: 'ApiService', level: 900);
-         return false;
+        developer.log('Failed to mark notification read: Status code ${response.statusCode}', name: 'ApiService');
+        return false;
       }
     } on DioException catch (e) {
-       developer.log('DioError marking notification read: ${e.message}', name: 'ApiService', error: e, stackTrace: e.stackTrace);
-       // Handle specific Dio errors if needed
-       return false;
+      developer.log('DioError marking notification read: ${e.message}', name: 'ApiService', error: e);
+      return false;
     } catch (e, s) {
-      developer.log('Error marking notification read: $e', name: 'ApiService', error: e, stackTrace: s, level: 1000);
+      developer.log('Error marking notification read: $e', name: 'ApiService', error: e, stackTrace: s);
       return false;
     }
   }
